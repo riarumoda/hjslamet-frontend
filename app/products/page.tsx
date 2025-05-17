@@ -14,7 +14,7 @@ export default async function ProductsPage() {
   const products = await getAllProducts()
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen flex flex-col items-center justify-center">
       <div className="container px-4 md:px-6 py-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>

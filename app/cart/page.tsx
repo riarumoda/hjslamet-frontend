@@ -32,7 +32,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col items-center">
       <div className="container px-4 md:px-6 py-6">
         <div className="flex items-center gap-2 mb-6">
           <Link href="/products">

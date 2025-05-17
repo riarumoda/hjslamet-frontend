@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 
 export default function AboutPage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="container px-4 md:px-6 py-8">
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="mx-auto max-w-screen-lg px-4 md:px-6 py-8">
         <div className="flex flex-col gap-2 mb-8">
           <h1 className="text-3xl font-bold tracking-tight">About H. Slamet</h1>
           <p className="text-muted-foreground">Learn about our story and mission</p>
