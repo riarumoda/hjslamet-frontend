@@ -206,7 +206,7 @@ export function getImagePath(path: string | null, width = 400, height = 400): st
   // Check if the path is already a full URL or an absolute path
   if (path.startsWith("http") || path.startsWith("/placeholder")) {
     return path
-  }
+  } 
 
   // Check if the file exists, if not, return a placeholder
   // In a real app, you'd check if the file exists on the server
