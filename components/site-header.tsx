@@ -26,7 +26,7 @@ export default function SiteHeader() {
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex flex-col items-center justify-center">
       <div className="container flex h-16 items-center">
         <Sheet>
           <SheetTrigger asChild>
@@ -72,7 +72,7 @@ export default function SiteHeader() {
         <div className="flex items-center gap-2 ml-auto">
           {isSearchOpen ? (
             <div className="relative flex items-center">
-              <Input type="search" placeholder="Search..." className="w-[200px] sm:w-[300px]" autoFocus />
+              <Input type="text" placeholder="Search..." className="w-[200px] sm:w-[300px]" autoFocus />
               <Button variant="ghost" size="icon" className="absolute right-0" onClick={() => setIsSearchOpen(false)}>
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close search</span>

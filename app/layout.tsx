@@ -30,7 +30,7 @@ export default function RootLayout({
             <CartProvider>
               <div className="relative flex min-h-screen flex-col">
                 <SiteHeader />
-                <main className="flex-1">{children}</main>
+                <main className="flex flex-col items-center justify-center">{children}</main>
                 <SiteFooter />
               </div>
               <Sonner />

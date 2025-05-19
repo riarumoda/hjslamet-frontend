@@ -3,8 +3,8 @@ import { Facebook, Instagram, Twitter } from "lucide-react"
 
 export default function SiteFooter() {
   return (
-    <footer className="w-full border-t bg-background">
-      <div className="container px-4 md:px-6 py-8 md:py-12">
+    <footer className="w-full border-t bg-background flex flex-col items-center justify-center">
+      <div className="container px-4 md:px-6 py-8 md:py-12 ">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">H. Slamet</h3>
