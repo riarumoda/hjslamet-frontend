@@ -12,7 +12,6 @@ export interface Product {
   discount: number
   category: string
   brand: string
-  itemsSold: number
   quantity: number
 }
 
