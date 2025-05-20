@@ -19,7 +19,7 @@ const products: Product[] = [
     discount: 20,
     category: "electronics",
     brand: "SoundWave",
-    itemsSold: 1284,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -34,7 +34,7 @@ const products: Product[] = [
     discount: 15,
     category: "electronics",
     brand: "FitTech",
-    itemsSold: 956,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -49,7 +49,7 @@ const products: Product[] = [
     discount: 0,
     category: "clothing",
     brand: "EcoWear",
-    itemsSold: 672,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -64,7 +64,7 @@ const products: Product[] = [
     discount: 10,
     category: "home",
     brand: "HydroLife",
-    itemsSold: 2035,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -79,7 +79,7 @@ const products: Product[] = [
     discount: 0,
     category: "electronics",
     brand: "PowerUp",
-    itemsSold: 1127,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -94,7 +94,7 @@ const products: Product[] = [
     discount: 25,
     category: "accessories",
     brand: "LuxStyle",
-    itemsSold: 876,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -109,7 +109,7 @@ const products: Product[] = [
     discount: 25,
     category: "electronics",
     brand: "SecureTech",
-    itemsSold: 1562,
+    itemsSold: 0,
     quantity: 123456,
   },
   {
@@ -124,7 +124,7 @@ const products: Product[] = [
     discount: 0,
     category: "home",
     brand: "HomeEssentials",
-    itemsSold: 734,
+    itemsSold: 0,
     quantity: 123456,
   },
 ]

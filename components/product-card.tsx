@@ -45,10 +45,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-4">
         <h3 className="font-medium truncate">{product.name}</h3>
         <div className="flex items-center gap-2 mt-1">
-          <div className="flex items-center text-xs text-muted-foreground">
-            <ShoppingBag className="h-3 w-3 mr-1" />
-            <span>{product.itemsSold.toLocaleString()} pcs</span>
-          </div>
         </div>
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-1">
