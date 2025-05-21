@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Menu, Moon, Search, ShoppingCart, Sun, User, X } from "lucide-react"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Menu, Moon, Search, ShoppingCart, Sun, User, X } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useTheme } from "next-themes"
-import { useCart } from "@/hooks/use-cart"
-import { useAuth } from "@/hooks/use-auth"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useTheme } from "next-themes";
+import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function SiteHeader() {
-  const { theme, setTheme } = useTheme()
-  const { cart } = useCart()
-  const { user, logout } = useAuth()
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const { theme, setTheme } = useTheme();
+  const { cart } = useCart();
+  const { user, logout } = useAuth();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Fix theme toggle by ensuring component is mounted
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0)
+  const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex flex-col items-center justify-center">
@@ -52,42 +52,76 @@ export default function SiteHeader() {
             </nav>
           </SheetContent>
         </Sheet>
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+        <Link href="/" className="mx-6 flex items-center space-x-2">
           <span className="hidden font-bold sm:inline-block">H. Slamet</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/" className="font-medium transition-colors hover:text-primary">
+          <Link
+            href="/"
+            className="font-medium transition-colors hover:text-primary"
+          >
             Home
           </Link>
-          <Link href="/products" className="font-medium transition-colors hover:text-primary">
+          <Link
+            href="/products"
+            className="font-medium transition-colors hover:text-primary"
+          >
             Products
           </Link>
-          <Link href="/categories" className="font-medium transition-colors hover:text-primary">
+          <Link
+            href="/categories"
+            className="font-medium transition-colors hover:text-primary"
+          >
             Categories
           </Link>
-          <Link href="/about" className="font-medium transition-colors hover:text-primary">
+          <Link
+            href="/about"
+            className="font-medium transition-colors hover:text-primary"
+          >
             About
           </Link>
         </nav>
         <div className="flex items-center gap-2 ml-auto">
           {isSearchOpen ? (
             <div className="relative flex items-center">
-              <Input type="text" placeholder="Search..." className="w-[200px] sm:w-[300px]" autoFocus />
-              <Button variant="ghost" size="icon" className="absolute right-0" onClick={() => setIsSearchOpen(false)}>
+              <Input
+                type="text"
+                placeholder="Search..."
+                className="w-[200px] sm:w-[300px]"
+                autoFocus
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0"
+                onClick={() => setIsSearchOpen(false)}
+              >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close search</span>
               </Button>
             </div>
           ) : (
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(true)}
+            >
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
             </Button>
           )}
 
           {mounted && (
-            <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
               <span className="sr-only">Toggle theme</span>
             </Button>
           )}
@@ -111,13 +145,22 @@ export default function SiteHeader() {
                 <span className="sr-only">Account</span>
               </Button>
               <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-background border hidden group-hover:block">
-                <Link href="/account" className="block px-4 py-2 text-sm hover:bg-muted">
+                <Link
+                  href="/account"
+                  className="block px-4 py-2 text-sm hover:bg-muted"
+                >
                   My Account
                 </Link>
-                <Link href="/account/orders" className="block px-4 py-2 text-sm hover:bg-muted">
+                <Link
+                  href="/account/orders"
+                  className="block px-4 py-2 text-sm hover:bg-muted"
+                >
                   My Orders
                 </Link>
-                <button onClick={logout} className="block w-full text-left px-4 py-2 text-sm hover:bg-muted">
+                <button
+                  onClick={logout}
+                  className="block w-full text-left px-4 py-2 text-sm hover:bg-muted"
+                >
                   Logout
                 </button>
               </div>
@@ -133,5 +176,5 @@ export default function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }
