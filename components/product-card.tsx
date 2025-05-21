@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/use-cart"
 import { getImagePath } from "@/lib/api"
 import type { Product } from "@/types"
+import { formatRupiah } from '@/lib/currency';
 
 interface ProductCardProps {
   product: Product
@@ -48,9 +49,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-1">
-            <span className="font-medium">${product.price.toFixed(2)}</span>
+            <span className="font-medium">{formatRupiah(product.price)}</span>
             {product.oldPrice && (
-              <span className="text-xs text-muted-foreground line-through">${product.oldPrice.toFixed(2)}</span>
+              <span className="text-xs text-muted-foreground line-through">{formatRupiah(product.oldPrice)}</span>
             )}
           </div>
         </div>
