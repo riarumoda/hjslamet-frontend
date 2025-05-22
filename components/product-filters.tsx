@@ -1,29 +1,32 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Slider } from "@/components/ui/slider"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Slider } from "@/components/ui/slider";
 
 export default function ProductFilters() {
-  const [priceRange, setPriceRange] = useState([0, 1000])
-  const [openCategories, setOpenCategories] = useState(true)
-  const [openPrice, setOpenPrice] = useState(true)
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [openCategories, setOpenCategories] = useState(true);
+  const [openPrice, setOpenPrice] = useState(true);
 
   const categories = [
-    { id: "electronics", label: "Electronics" },
-    { id: "clothing", label: "Clothing" },
-    { id: "home", label: "Home & Kitchen" },
-    { id: "books", label: "Books" },
-    { id: "toys", label: "Toys & Games" },
-  ]
-
-
+    { id: "MAKANAN", label: "Food" },
+    { id: "MINUMAN", label: "Beverages" },
+    { id: "BAHAN_BAKU", label: "Raw Stockpiles" },
+    { id: "KEBUTUHAN DAPUR", label: "Kitchen Supplies" },
+    { id: "KOSMETIK", label: "Cosmetics" },
+    { id: "LAINNYA", label: "Others" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -37,13 +40,17 @@ export default function ProductFilters() {
       <Collapsible open={openCategories} onOpenChange={setOpenCategories}>
         <CollapsibleTrigger className="flex w-full items-center justify-between py-2 font-medium">
           Categories
-          <ChevronDown className={`h-4 w-4 transition-transform ${openCategories ? "rotate-180" : ""}`} />
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${
+              openCategories ? "rotate-180" : ""
+            }`}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 pb-4">
           <div className="space-y-2">
             {categories.map((category) => (
               <div key={category.id} className="flex items-center space-x-2">
-                <Checkbox id={`category-${category.id}`} />
+                <Checkbox id={`category-${category.id.toLowerCase()}`} />
                 <label
                   htmlFor={`category-${category.id}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -56,15 +63,24 @@ export default function ProductFilters() {
         </CollapsibleContent>
       </Collapsible>
 
-
       <Collapsible open={openPrice} onOpenChange={setOpenPrice}>
         <CollapsibleTrigger className="flex w-full items-center justify-between py-2 font-medium">
           Price Range
-          <ChevronDown className={`h-4 w-4 transition-transform ${openPrice ? "rotate-180" : ""}`} />
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${
+              openPrice ? "rotate-180" : ""
+            }`}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 pb-4">
           <div className="space-y-4">
-            <Slider defaultValue={[0, 1000]} max={1000} step={10} value={priceRange} onValueChange={setPriceRange} />
+            <Slider
+              defaultValue={[0, 1000]}
+              max={1000}
+              step={10}
+              value={priceRange}
+              onValueChange={setPriceRange}
+            />
             <div className="flex items-center justify-between">
               <span className="text-sm">${priceRange[0]}</span>
               <span className="text-sm">${priceRange[1]}</span>
@@ -75,9 +91,8 @@ export default function ProductFilters() {
           </div>
         </CollapsibleContent>
       </Collapsible>
-
     </div>
-  )
+  );
 }
 
 // function Star(props: React.SVGProps<SVGSVGElement>) {

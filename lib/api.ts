@@ -1,5 +1,5 @@
 import type { Product, Category, PaymentConfirmation } from "@/types"
-import { Headphones, Shirt, Home, BookOpen, Gamepad, Smartphone, Watch, Laptop } from "lucide-react"
+import { CupSoda, Wheat, Utensils, ChefHat, Scissors, Ellipsis } from "lucide-react"
 
 // Import product images from assets folder
 // This makes it easy for developers to replace with real images from backend
@@ -124,68 +124,52 @@ const products: Product[] = [
 // Mock data for categories
 const categories: Category[] = [
   {
-    id: "electronics",
-    name: "Electronics",
-    description: "Latest gadgets and electronic devices",
+    id: "MAKANAN",
+    name: "Food",
+    description: "Finest Food Products You'll Ever Taste",
     productCount: 42,
-    icon: Smartphone,
+    icon: Utensils,
     image: `${ASSET_PREFIX}/categories/electronics.jpg`,
   },
   {
-    id: "clothing",
-    name: "Clothing",
-    description: "Fashionable apparel for all occasions",
+    id: "MINUMAN",
+    name: "Beverages",
+    description: "Fresh Beverages You'll Ever Find",
     productCount: 56,
-    icon: Shirt,
+    icon: CupSoda,
     image: `${ASSET_PREFIX}/categories/clothing.jpg`,
   },
   {
-    id: "home",
-    name: "Home & Kitchen",
-    description: "Everything you need for your home",
+    id: "BAHAN_BAKU",
+    name: "Raw Stockpiles",
+    description: "Everything you need for your cooking",
     productCount: 38,
-    icon: Home,
+    icon: Wheat,
     image: `${ASSET_PREFIX}/categories/home.jpg`,
   },
   {
-    id: "books",
-    name: "Books",
-    description: "Bestsellers and literary classics",
+    id: "KEBUTUHAN_DAPUR",
+    name: "Kitchen Supplies",
+    description: "Pepper, salt, and everything in between",
     productCount: 24,
-    icon: BookOpen,
+    icon: ChefHat,
     image: `${ASSET_PREFIX}/categories/books.jpg`,
   },
   {
-    id: "toys",
-    name: "Toys & Games",
-    description: "Fun for all ages",
+    id: "KOSMETIK",
+    name: "Cosmetics",
+    description: "Beauty and care products for everyone",
     productCount: 31,
-    icon: Gamepad,
+    icon: Scissors,
     image: `${ASSET_PREFIX}/categories/toys.jpg`,
   },
   {
-    id: "wearables",
-    name: "Wearables",
-    description: "Smart watches and fitness trackers",
+    id: "LAINNYA",
+    name: "Others",
+    description: "And many more. Go find something you like",
     productCount: 18,
-    icon: Watch,
+    icon: Ellipsis,
     image: `${ASSET_PREFIX}/categories/wearables.jpg`,
-  },
-  {
-    id: "computers",
-    name: "Computers & Laptops",
-    description: "Powerful computing solutions",
-    productCount: 27,
-    icon: Laptop,
-    image: `${ASSET_PREFIX}/categories/computers.jpg`,
-  },
-  {
-    id: "audio",
-    name: "Audio",
-    description: "Headphones, speakers, and sound systems",
-    productCount: 22,
-    icon: Headphones,
-    image: `${ASSET_PREFIX}/categories/audio.jpg`,
   },
 ]
 
