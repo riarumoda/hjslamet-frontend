@@ -265,6 +265,30 @@ export async function fetchProductsFromJavaBackend() {
   }
 }
 
+// Example of how to use the Java backend connection
+export async function fetchAuthLoginFromJavaBackend() {
+  try {
+    // This would be replaced with an actual call to your Java backend
+    return await fetchData("auth/login", "POST")
+  } catch (error) {
+    console.error("Failed to fetch login from Java backend:", error)
+    // Fallback to mock data if Java backend is not available
+    return []
+  }
+}
+
+// Example of how to use the Java backend connection
+export async function fetchAuthRegisterFromJavaBackend() {
+  try {
+    // This would be replaced with an actual call to your Java backend
+    return await fetchData("auth/register", "POST")
+  } catch (error) {
+    console.error("Failed to fetch register from Java backend:", error)
+    // Fallback to mock data if Java backend is not available
+    return []
+  }
+}
+
 export async function createOrder(orderData: any) {
   try {
     return await fetchData("orders", "POST", orderData)

@@ -1,5 +1,6 @@
 "use client"
 
+import { fetchData } from "@/lib/api"
 import type React from "react"
 
 import { createContext, useContext, useEffect, useState } from "react"
@@ -48,16 +49,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     // In a real app, this would make an API call to your Java backend
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      setTimeout(async () => {
         // Simulate successful login
         if (email && password) {
-          const newUser = {
-            id: "user-1",
-            name: email.split("@")[0],
-            email,
+          try {
+            var response = await fetchData("auth/login/admin", "POST", { 
+              "email": email, "password": password 
+            });
+            const token = response.token;
+            
+            var responseUser = await fetchData("user/me-admin", "GET", null, token);
+            const newUser = {
+              id: responseUser.id,
+              name: responseUser.name,
+              email: responseUser.email,
+            }
+            setUser(newUser)
+            localStorage.setItem("user", JSON.stringify(newUser));
+            localStorage.setItem("token", JSON.stringify(response));
+          } catch (error) {
+            console.error("Error fetching user data:", error)
+            reject(new Error("Failed to fetch user data"))
+            return
           }
-          setUser(newUser)
-          localStorage.setItem("user", JSON.stringify(newUser))
           resolve()
         } else {
           reject(new Error("Invalid credentials"))
