@@ -13,11 +13,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
+import { formatRupiah } from "@/lib/currency"
 
 export default function ProductFilters() {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [openCategories, setOpenCategories] = useState(true);
-  const [openPrice, setOpenPrice] = useState(true);
+  const [priceRange, setPriceRange] = useState([0, 1000000])
+  const [openCategories, setOpenCategories] = useState(true)
+  const [openPrice, setOpenPrice] = useState(true)
 
   const categories = [
     { id: "MAKANAN", label: "Food" },
@@ -75,15 +76,15 @@ export default function ProductFilters() {
         <CollapsibleContent className="pt-2 pb-4">
           <div className="space-y-4">
             <Slider
-              defaultValue={[0, 1000]}
-              max={1000}
+              defaultValue={[0, 1000000]}
+              max={1000000}
               step={10}
               value={priceRange}
               onValueChange={setPriceRange}
             />
             <div className="flex items-center justify-between">
-              <span className="text-sm">${priceRange[0]}</span>
-              <span className="text-sm">${priceRange[1]}</span>
+              <span className="text-sm">{formatRupiah(priceRange[0])}</span>
+              <span className="text-sm">{formatRupiah(priceRange[1])}</span>
             </div>
             <Button size="sm" className="w-full">
               Apply
