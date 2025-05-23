@@ -18,7 +18,6 @@ const products: Product[] = [
     isNew: true,
     discount: 20,
     category: "electronics",
-    brand: "SoundWave",
     quantity: 123456,
   },
   {
@@ -32,7 +31,6 @@ const products: Product[] = [
     isNew: false,
     discount: 15,
     category: "electronics",
-    brand: "FitTech",
     quantity: 123456,
   },
   {
@@ -46,7 +44,6 @@ const products: Product[] = [
     isNew: false,
     discount: 0,
     category: "clothing",
-    brand: "EcoWear",
     quantity: 123456,
   },
   {
@@ -60,7 +57,6 @@ const products: Product[] = [
     isNew: false,
     discount: 10,
     category: "home",
-    brand: "HydroLife",
     quantity: 123456,
   },
   {
@@ -74,7 +70,6 @@ const products: Product[] = [
     isNew: true,
     discount: 0,
     category: "electronics",
-    brand: "PowerUp",
     quantity: 123456,
   },
   {
@@ -88,7 +83,6 @@ const products: Product[] = [
     isNew: false,
     discount: 25,
     category: "accessories",
-    brand: "LuxStyle",
     quantity: 123456,
   },
   {
@@ -102,7 +96,6 @@ const products: Product[] = [
     isNew: false,
     discount: 25,
     category: "electronics",
-    brand: "SecureTech",
     quantity: 123456,
   },
   {
@@ -116,7 +109,6 @@ const products: Product[] = [
     isNew: false,
     discount: 0,
     category: "home",
-    brand: "HomeEssentials",
     quantity: 123456,
   },
 ]
@@ -196,8 +188,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 // API functions to fetch data
 export async function getAllProducts(): Promise<Product[]> {
   // Simulate API call to Java backend
-  await delay(500)
-  return products
+  return await fetchProductsFromJavaBackend()
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
@@ -219,7 +210,7 @@ export async function getRelatedProducts(id: string): Promise<Product[]> {
   if (!product) return []
 
   return products
-    .filter((p) => p.id !== id && (p.category === product.category || p.brand === product.brand))
+    .filter((p) => p.id !== id && (p.category === product.category))
     .slice(0, 4)
 }
 
@@ -236,7 +227,7 @@ export async function getProductsByCategory(categoryId: string): Promise<Product
 }
 
 // Function to connect to Java backend
-export async function connectToJavaBackend(endpoint: string, method = "GET", data?: any) {
+export async function fetchData(endpoint: string, method = "GET", payload?: any, token?: string) {
   // Replace with your actual Java backend URL
   const JAVA_BACKEND_URL = process.env.JAVA_BACKEND_URL || "http://localhost:8080/api"
 
@@ -246,8 +237,9 @@ export async function connectToJavaBackend(endpoint: string, method = "GET", dat
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: data ? JSON.stringify(data) : undefined,
+      body: payload ? JSON.stringify(payload) : undefined,
     })
 
     if (!response.ok) {
@@ -265,17 +257,17 @@ export async function connectToJavaBackend(endpoint: string, method = "GET", dat
 export async function fetchProductsFromJavaBackend() {
   try {
     // This would be replaced with an actual call to your Java backend
-    return await connectToJavaBackend("products")
+    return await fetchData("products")
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     // Fallback to mock data if Java backend is not available
-    return products
+    return []
   }
 }
 
 export async function createOrder(orderData: any) {
   try {
-    return await connectToJavaBackend("orders", "POST", orderData)
+    return await fetchData("orders", "POST", orderData)
   } catch (error) {
     console.error("Failed to create order:", error)
     throw error

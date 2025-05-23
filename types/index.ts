@@ -11,7 +11,6 @@ export interface Product {
   isNew: boolean
   discount: number
   category: string
-  brand: string
   quantity: number
 }
 
