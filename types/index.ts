@@ -65,3 +65,18 @@ export interface PaymentConfirmation {
   notes?: string
   receiptImage?: File | null
 }
+
+export interface Member {
+  name: string;
+  pnumber: string;
+  email: string;
+  address: string;
+  isBanned: boolean;
+}
+
+export interface LoggedInUser {
+  userId: string;
+  pnumber: string;
+  name: string;
+  email: string;
+}

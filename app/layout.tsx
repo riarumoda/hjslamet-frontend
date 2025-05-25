@@ -9,6 +9,7 @@ import SiteFooter from "@/components/site-footer";
 import { CartProvider } from "@/hooks/use-cart";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Sonner } from "@/components/ui/sonner";
+import ConditionalLayout from "@/components/conditional-layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,13 +29,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <CartProvider>
-              <div className="relative flex min-h-screen flex-col items-center justify-center">
-                <SiteHeader />
-                <main className="flex flex-col items-center justify-center">
-                  {children}
-                </main>
-                <SiteFooter />
-              </div>
+              <ConditionalLayout>{children}</ConditionalLayout>
               <Sonner />
             </CartProvider>
           </AuthProvider>
