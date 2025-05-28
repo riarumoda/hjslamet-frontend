@@ -323,7 +323,10 @@ export async function fetchData(endpoint: string, method = "GET", payload?: any,
     })
 
     if (!response.ok) {
-      throw new Error(`Error: ${response.status} - ${response.statusText}`)
+      if (response.status === 401) {
+        return { unauthorized: true };
+      }
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
     }
 
     return await response.json()

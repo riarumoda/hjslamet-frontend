@@ -5,6 +5,7 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { dummyUser } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
 interface NavbarAdminProps {
   drawerOpen: boolean;
@@ -12,6 +13,8 @@ interface NavbarAdminProps {
 }
 
 export default function NavbarAdmin({ drawerOpen, setDrawerOpen }: NavbarAdminProps) {
+    const router = useRouter()
+
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +34,12 @@ export default function NavbarAdmin({ drawerOpen, setDrawerOpen }: NavbarAdminPr
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const handleSignOut = () => {
+        localStorage.removeItem("admin");
+        
+        router.push("/admin/auth")
+    };
 
     return (
         <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -103,7 +112,7 @@ export default function NavbarAdmin({ drawerOpen, setDrawerOpen }: NavbarAdminPr
                                         </div>
                                         <ul className="py-1" role="none">
                                             <li>
-                                                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a>
+                                                <button onClick={handleSignOut} className="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</button>
                                             </li>
                                         </ul>
                                     </div>
