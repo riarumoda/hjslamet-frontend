@@ -323,6 +323,9 @@ export async function fetchData(endpoint: string, method = "GET", payload?: any,
     })
 
     if (!response.ok) {
+      if (response.status === 401) {
+        return { error: true, message: "Unauthorized", status: 401 };
+      }
       throw new Error(`Error: ${response.status} - ${response.statusText}`)
     }
 

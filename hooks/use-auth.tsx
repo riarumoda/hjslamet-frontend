@@ -15,6 +15,7 @@ interface AuthContextType {
   user: User | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
+  loginAdmin: (email: string, password: string) => Promise<{ success: boolean; message: string }> 
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
 }
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   login: async () => {},
+  loginAdmin: async () => ({ success: false, message: "Not implemented" }),
   register: async () => {},
   logout: () => {},
 })
@@ -102,6 +104,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  /**
+   * Melakukan proses login admin dengan mengirimkan email dan password ke backend.
+   * Jika berhasil, token akan disimpan ke localStorage dalam bentuk objek `admin`.
+   *
+   * @param email - Alamat email admin
+   * @param password - Kata sandi admin
+   * @returns Promise<boolean> - Mengembalikan true jika login berhasil, atau throw error jika gagal
+   * @throws Error - Jika terjadi kesalahan selama proses login (misalnya kredensial salah atau error server)
+   */
+  const loginAdmin = async (email: string, password: string): Promise<{ success: boolean; message: string }>  => {
+    // Validasi input
+    if (!email || !password) {
+      return { success: false, message: "Email and password must not be empty." };
+    }
+
+    try {
+      // Mengirim request login ke backend
+      const response = await fetchData("auth/login/admin", "POST", { email, password });
+
+      if (!response.token) {
+        return { success: false, message: "Please check your email and password." };
+      }
+
+      const token = response.token;
+
+      // Mengambil data user setelah login berhasil
+      const responseUser = await fetchData("user/me-admin", "GET", null, token);
+
+      const newUser = {
+        id: responseUser.id,
+        name: responseUser.name,
+        email: responseUser.email,
+      };
+
+      // Simpan user ke state dan localStorage
+      setUser(newUser); // Pastikan setUser berasal dari context/state management
+      localStorage.setItem("user", JSON.stringify(newUser));
+
+      // Simpan token dan informasi kadaluarsa ke localStorage
+      const tokenWithMeta = {
+        token: response.token,
+        refreshToken: response.refreshToken,
+        tokenExpiration: Date.now() + 3600000, // token berlaku selama 1 jam
+      };
+
+      localStorage.setItem("token", JSON.stringify(tokenWithMeta));
+
+      return { success: true, message: "Login successful." };
+    } catch (error) {
+      return { success: false, message: "Please check your email and password." };
+    }
+  };
+
   // Logout function
   const logout = () => {
     setUser(null)
@@ -115,6 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
+        loginAdmin,
         logout,
       }}
     >
