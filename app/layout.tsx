@@ -10,6 +10,7 @@ import { CartProvider } from "@/hooks/use-cart";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Sonner } from "@/components/ui/sonner";
 import ConditionalLayout from "@/components/conditional-layout";
+import ToastContainer from "@/components/ToastContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <ToastContainer />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <CartProvider>
