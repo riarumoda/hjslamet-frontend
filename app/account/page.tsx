@@ -1,34 +1,41 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { MapPin, Package, Settings, User } from "lucide-react"
+import { useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MapPin, Package, Settings, User } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "@/hooks/use-auth"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AccountPage() {
-  const router = useRouter()
-  const { user, isLoading } = useAuth()
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push("/auth/login?returnUrl=/account")
+      router.push("/auth/login?returnUrl=/account");
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, router]);
 
   if (isLoading) {
     return (
       <div className="container py-12 flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return null // Will redirect in useEffect
+    return null; // Will redirect in useEffect
   }
 
   const accountSections = [
@@ -56,7 +63,7 @@ export default function AccountPage() {
       icon: Settings,
       href: "/account/settings",
     },
-  ]
+  ];
 
   return (
     <div className="container px-4 md:px-6 py-8">
@@ -73,11 +80,13 @@ export default function AccountPage() {
                 <div className="p-2 bg-primary/10 rounded-md">
                   <section.icon className="h-6 w-6 text-primary" />
                 </div>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-1">
                   <CardTitle className="text-xl">{section.title}</CardTitle>
                   <CardDescription>{section.description}</CardDescription>
                 </div>
-              </CardHeader>
+              </CardContent>
             </Card>
           </Link>
         ))}
@@ -88,7 +97,9 @@ export default function AccountPage() {
         <Card>
           <CardHeader>
             <CardTitle>Your Recent Orders</CardTitle>
-            <CardDescription>Track and manage your recent purchases</CardDescription>
+            <CardDescription>
+              Track and manage your recent purchases
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {[
@@ -107,14 +118,19 @@ export default function AccountPage() {
                 items: 1,
               },
             ].map((order) => (
-              <div key={order.id} className="flex items-center justify-between py-4 border-b last:border-0">
+              <div
+                key={order.id}
+                className="flex items-center justify-between py-4 border-b last:border-0"
+              >
                 <div>
                   <p className="font-medium">{order.id}</p>
                   <p className="text-sm text-muted-foreground">{order.date}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">{order.total}</p>
-                  <p className="text-sm text-muted-foreground">{order.items} items</p>
+                  <p className="text-sm text-muted-foreground">
+                    {order.items} items
+                  </p>
                 </div>
                 <div>
                   <span
@@ -145,5 +161,5 @@ export default function AccountPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
