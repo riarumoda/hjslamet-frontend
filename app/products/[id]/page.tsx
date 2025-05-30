@@ -1,105 +1,115 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ChevronLeft, Minus, Plus, ShoppingCart, ShoppingBag } from "lucide-react"
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
+import {
+  ChevronLeft,
+  Minus,
+  Plus,
+  ShoppingCart,
+  ShoppingBag,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { toast } from "sonner"
-import ProductCard from "@/components/product-card"
-import LoginPrompt from "@/components/login-prompt"
-import { useAuth } from "@/hooks/use-auth"
-import { useCart } from "@/hooks/use-cart"
-import { getProductById, getRelatedProducts, getImagePath } from "@/lib/api"
-import type { Product } from "@/types"
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import ProductCard from "@/components/product-card";
+import LoginPrompt from "@/components/login-prompt";
+import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
+import { getProductById, getRelatedProducts, getImagePath } from "@/lib/api";
+import type { Product } from "@/types";
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const { addToCart } = useCart()
+export default function ProductPage() {
+  const router = useRouter();
+  const params = useParams();
+  const id =
+    typeof params.id === "string"
+      ? params.id
+      : Array.isArray(params.id)
+      ? params.id[0]
+      : "";
+  const { user, isLoading: authLoading } = useAuth();
+  const { addToCart } = useCart();
 
-  const [product, setProduct] = useState<Product | null>(null)
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [quantity, setQuantity] = useState(1)
-  const [isLoading, setIsLoading] = useState(true)
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [quantity, setQuantity] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productData = await getProductById(params.id)
+        const productData = await getProductById(id);
         if (productData) {
-          setProduct(productData)
-          const related = await getRelatedProducts(params.id)
-          setRelatedProducts(related)
+          setProduct(productData);
+          const related = await getRelatedProducts(id);
+          setRelatedProducts(related);
         }
       } catch (error) {
-        console.error("Error fetching product:", error)
+        console.error("Error fetching product:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [params.id])
+    fetchData();
+  }, [id]);
 
   useEffect(() => {
     // Show login prompt if user is not logged in and not currently loading auth state
     if (!authLoading && !user && !showLoginPrompt) {
-      setShowLoginPrompt(true)
+      setShowLoginPrompt(true);
     }
-  }, [user, authLoading, showLoginPrompt])
+  }, [user, authLoading, showLoginPrompt]);
 
   const handleAddToCart = () => {
     if (!user) {
-      setShowLoginPrompt(true)
-      return
+      setShowLoginPrompt(true);
+      return;
     }
 
     if (product) {
-      addToCart({ ...product, quantity })
-      toast(
-            "Added to cart"+
-             `${product.name} has been added to your cart.`
-      )
+      addToCart({ ...product, quantity });
+      toast("Added to cart" + `${product.name} has been added to your cart.`);
     }
-  }
+  };
 
   const handleBuyNow = () => {
     if (!user) {
-      setShowLoginPrompt(true)
-      return
+      setShowLoginPrompt(true);
+      return;
     }
 
     if (product) {
-      addToCart({ ...product, quantity })
-      router.push("/cart")
+      addToCart({ ...product, quantity });
+      router.push("/cart");
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="container py-12 flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
-    )
+    );
   }
 
   if (!product) {
-    return <div className="container py-12 text-center">Product not found</div>
+    return <div className="container py-12 text-center">Product not found</div>;
   }
 
   if (showLoginPrompt) {
-    return <LoginPrompt returnUrl={`/products/${params.id}`} />
+    return <LoginPrompt returnUrl={`/products/${params.id}`} />;
   }
 
   // Get image paths with fallbacks
-  const mainImageSrc = getImagePath(product.image, 600, 600)
-  const imageAlt = product.imageAlt || product.name
+  const mainImageSrc = getImagePath(product.image, 600, 600);
+  const imageAlt = product.imageAlt || product.name;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -126,7 +136,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+                <div
+                  key={i}
+                  className="relative aspect-square overflow-hidden rounded-lg bg-muted"
+                >
                   <Image
                     src={mainImageSrc || "/placeholder.svg"}
                     alt={`${product.name} thumbnail ${i}`}
@@ -141,17 +154,19 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <div className="flex flex-col gap-4">
             <div>
               <h1 className="text-3xl font-bold">{product.name}</h1>
-              <div className="flex items-center gap-2 mt-2">
+              {/* <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <ShoppingBag className="h-4 w-4 mr-1" />
                   <span>{product.itemsSold.toLocaleString()} items sold</span>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div>
               <p className="text-2xl font-bold">${product.price.toFixed(2)}</p>
               {product.oldPrice && (
-                <p className="text-sm text-muted-foreground line-through">${product.oldPrice.toFixed(2)}</p>
+                <p className="text-sm text-muted-foreground line-through">
+                  ${product.oldPrice.toFixed(2)}
+                </p>
               )}
             </div>
             <Separator />
@@ -163,12 +178,20 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <div>
               <h2 className="font-medium mb-2">Quantity</h2>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                >
                   <Minus className="h-4 w-4" />
                   <span className="sr-only">Decrease</span>
                 </Button>
                 <span className="w-12 text-center">{quantity}</span>
-                <Button variant="outline" size="icon" onClick={() => setQuantity(quantity + 1)}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(quantity + 1)}
+                >
                   <Plus className="h-4 w-4" />
                   <span className="sr-only">Increase</span>
                 </Button>
@@ -179,7 +202,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
               </Button>
-              <Button variant="outline" size="lg" className="w-full" onClick={handleBuyNow}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full"
+                onClick={handleBuyNow}
+              >
                 Buy Now
               </Button>
             </div>
@@ -212,5 +240,5 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
