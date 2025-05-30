@@ -54,6 +54,7 @@ export interface Address {
   state: string
   zipCode: string
   country: string
+  index?: number
 }
 
 export interface PaymentConfirmation {
@@ -79,4 +80,10 @@ export interface LoggedInUser {
   pnumber: string;
   name: string;
   email: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
 }

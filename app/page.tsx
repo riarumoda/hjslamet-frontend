@@ -3,15 +3,15 @@ import { ArrowRight, ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/product-card";
-import { getFeaturedProducts } from "@/lib/api";
+import { getLatestProducts } from "@/lib/api";
 
 export default async function Home() {
-  const featuredProducts = await getFeaturedProducts();
+  const featuredProducts = await getLatestProducts();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted flex flex-col items-center justify-center flex flex-col items-center justify-center">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted flex flex-col items-center justify-center">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="flex flex-col justify-center space-y-4">
@@ -61,10 +61,10 @@ export default async function Home() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
-                Featured Products
+                Latest Products
               </h2>
               <p className="max-w-[700px] text-muted-foreground md:text-xl">
-                Check out our most popular items handpicked for you
+                Check out our most latest items handpicked for you
               </p>
             </div>
           </div>

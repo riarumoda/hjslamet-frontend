@@ -265,25 +265,28 @@ export async function getAllProducts(): Promise<Product[]> {
   return await fetchProductsFromJavaBackend()
 }
 
-export async function getFeaturedProducts(): Promise<Product[]> {
-  // Simulate API call to Java backend
-  await delay(300)
-  return products.slice(0, 4)
+export async function getLatestProducts(): Promise<Product[]> {
+  const allProducts = await getAllProducts()
+  console.log("Fetched products:", allProducts)
+  
+  return allProducts.filter((product) => product.isNew === true) ;
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  // Simulate API call to Java backend
-  await delay(200)
-  return products.find((product) => product.id === id)
+  try {
+    return await fetchData("products/one/"+id)
+  } catch (error) {
+    console.error("Failed to fetch products from Java backend:", error)
+    return undefined
+  }
 }
 
 export async function getRelatedProducts(id: string): Promise<Product[]> {
-  // Simulate API call to Java backend
-  await delay(300)
-  const product = products.find((p) => p.id === id)
+  const allProducts = await getAllProducts()
+  const product = allProducts.find((p) => p.id === id)
   if (!product) return []
 
-  return products
+  return allProducts
     .filter((p) => p.id !== id && (p.category === product.category))
     .slice(0, 4)
 }
@@ -295,9 +298,30 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
-  // Simulate API call to Java backend
-  await delay(400)
-  return products.filter((product) => product.category === categoryId)
+  try {
+    return await fetchData("products/category/"+categoryId)
+  } catch (error) {
+    console.error("Failed to fetch products from Java backend:", error)
+    return []
+  }
+}
+
+export async function getProductsByPriceRange(min: number, max: number): Promise<Product[]> {
+  try {
+    return await fetchData("products/price/"+min.toString()+"/"+max.toString())
+  } catch (error) {
+    console.error("Failed to fetch products from Java backend:", error)
+    return []
+  }
+}
+
+export async function getProductsByName(name: string): Promise<Product[]> {
+  try {
+    return await fetchData("products/"+name);
+  } catch (error) {
+    console.error("Failed to fetch products from Java backend:", error)
+    return []
+  }
 }
 
 export async function getMembers(): Promise<Member[]> {

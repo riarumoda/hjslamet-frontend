@@ -13,22 +13,38 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
-import { formatRupiah } from "@/lib/currency"
+import { formatRupiah } from "@/lib/currency";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ProductFilters() {
-  const [priceRange, setPriceRange] = useState([0, 1000000])
-  const [openCategories, setOpenCategories] = useState(true)
-  const [openPrice, setOpenPrice] = useState(true)
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [openCategories, setOpenCategories] = useState(true);
+  const [openPrice, setOpenPrice] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Tambahkan state ini
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const categories = [
     { id: "MAKANAN", label: "Food" },
     { id: "MINUMAN", label: "Beverages" },
     { id: "BAHAN_BAKU", label: "Raw Stockpiles" },
-    { id: "KEBUTUHAN DAPUR", label: "Kitchen Supplies" },
+    { id: "KEBUTUHAN_DAPUR", label: "Kitchen Supplies" },
     { id: "KOSMETIK", label: "Cosmetics" },
     { id: "LAINNYA", label: "Others" },
   ];
 
+  const handleApply = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (selectedCategory) {
+      params.set("category", selectedCategory);
+    } else {
+      params.delete("category");
+    }
+    params.set("min", priceRange[0].toString());
+    params.set("max", priceRange[1].toString());
+    router.push(`/products?${params.toString()}`);
+  };
   return (
     <div className="space-y-6">
       <div>
@@ -51,7 +67,13 @@ export default function ProductFilters() {
           <div className="space-y-2">
             {categories.map((category) => (
               <div key={category.id} className="flex items-center space-x-2">
-                <Checkbox id={`category-${category.id.toLowerCase()}`} />
+                <Checkbox
+                  id={`category-${category.id.toLowerCase()}`}
+                  checked={selectedCategory === category.id}
+                  onCheckedChange={(checked) => {
+                    setSelectedCategory(checked ? category.id : null);
+                  }}
+                />
                 <label
                   htmlFor={`category-${category.id}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -86,7 +108,7 @@ export default function ProductFilters() {
               <span className="text-sm">{formatRupiah(priceRange[0])}</span>
               <span className="text-sm">{formatRupiah(priceRange[1])}</span>
             </div>
-            <Button size="sm" className="w-full">
+            <Button size="sm" className="w-full" onClick={handleApply}>
               Apply
             </Button>
           </div>
