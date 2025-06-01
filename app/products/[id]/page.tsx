@@ -14,7 +14,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import ProductCard from "@/components/product-card";
 import LoginPrompt from "@/components/login-prompt";
@@ -22,6 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { getProductById, getRelatedProducts, getImagePath } from "@/lib/api";
 import type { Product } from "@/types";
+import { formatRupiah } from "../../../lib/currency";
 
 export default function ProductPage() {
   const router = useRouter();
@@ -32,14 +32,13 @@ export default function ProductPage() {
       : Array.isArray(params.id)
       ? params.id[0]
       : "";
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, member } = useAuth();
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,31 +59,17 @@ export default function ProductPage() {
     fetchData();
   }, [id]);
 
-  useEffect(() => {
-    // Show login prompt if user is not logged in and not currently loading auth state
-    if (!authLoading && !user && !showLoginPrompt) {
-      setShowLoginPrompt(true);
-    }
-  }, [user, authLoading, showLoginPrompt]);
-
   const handleAddToCart = () => {
-    if (!user) {
-      setShowLoginPrompt(true);
-      return;
-    }
-
     if (product) {
       addToCart({ ...product, quantity });
-      toast("Added to cart" + `${product.name} has been added to your cart.`);
+      toast.success("Added to cart", {
+        description: `${product.name} has been added to your cart.`,
+        richColors: true,
+      });
     }
   };
 
   const handleBuyNow = () => {
-    if (!user) {
-      setShowLoginPrompt(true);
-      return;
-    }
-
     if (product) {
       addToCart({ ...product, quantity });
       router.push("/cart");
@@ -99,11 +84,21 @@ export default function ProductPage() {
     );
   }
 
+  if (authLoading) {
+    return (
+      <div className="container py-12 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!product) {
     return <div className="container py-12 text-center">Product not found</div>;
   }
 
-  if (showLoginPrompt) {
+  if (!user && !member) {
+    console.log("User: ", user);
+    console.log("Member: ", member);
     return <LoginPrompt returnUrl={`/products/${params.id}`} />;
   }
 
@@ -154,18 +149,20 @@ export default function ProductPage() {
           <div className="flex flex-col gap-4">
             <div>
               <h1 className="text-3xl font-bold">{product.name}</h1>
-              {/* <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <ShoppingBag className="h-4 w-4 mr-1" />
-                  <span>{product.itemsSold.toLocaleString()} items sold</span>
+                  <span>{product.stock} items left</span>
                 </div>
-              </div> */}
+              </div>
             </div>
             <div>
-              <p className="text-2xl font-bold">${product.price.toFixed(2)}</p>
+              <p className="text-2xl font-bold">
+                {formatRupiah(product.price)}
+              </p>
               {product.oldPrice && (
                 <p className="text-sm text-muted-foreground line-through">
-                  ${product.oldPrice.toFixed(2)}
+                  {formatRupiah(product.oldPrice)}
                 </p>
               )}
             </div>
@@ -197,7 +194,7 @@ export default function ProductPage() {
                 </Button>
               </div>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row mt-4">
+            <div className="flex flex-col gap-2 mt-4">
               <Button size="lg" className="w-full" onClick={handleAddToCart}>
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Add to Cart
@@ -213,23 +210,6 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
-        <Tabs defaultValue="details" className="mt-12">
-          <TabsList className="w-full sm:w-auto">
-            <TabsTrigger value="details">Details</TabsTrigger>
-          </TabsList>
-          <TabsContent value="details" className="mt-6">
-            <div className="grid gap-4">
-              <h3 className="text-lg font-medium">Product Details</h3>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>High-quality materials</li>
-                <li>Durable construction</li>
-                <li>Easy to clean</li>
-                <li>Versatile design</li>
-                <li>Satisfaction guaranteed</li>
-              </ul>
-            </div>
-          </TabsContent>
-        </Tabs>
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6">Related Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

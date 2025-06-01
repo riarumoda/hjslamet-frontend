@@ -61,8 +61,7 @@ const AuthContext = createContext<AuthContextType>({
   getRefreshToken: () => undefined,
 });
 
-const isTokenExpired = (expiration: number | null | undefined): boolean => {
-  if (!expiration) return true;
+const isTokenExpired = (expiration: number): boolean => {
   return Date.now() >= expiration;
 };
 
@@ -77,9 +76,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkAuth = async () => {
       const tokenStr = localStorage.getItem("token");
       const userStr = localStorage.getItem("user");
+      const memberStr = localStorage.getItem("member");
 
       // Jika belum pernah login, jangan redirect atau tampilkan error
-      if (!tokenStr || !userStr) {
+      if (!tokenStr || !userStr || !memberStr) {
+        setIsLoading(false);
+        return;
+      }
+
+      if (member && member.isBanned) {
+        toast.error("Your account has been banned. Please contact support.", {
+          richColors: true,
+        });
+        setUser(null);
+        setMember(null);
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("member");
+        router.replace("/account/banned");
         setIsLoading(false);
         return;
       }
@@ -94,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("member");
         router.replace("/auth/login");
         setIsLoading(false);
         return;
@@ -133,7 +148,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             };
             setMember(newMember);
             setUser(newUser);
+            if (member && member.isBanned) {
+              toast.error(
+                "Your account has been banned. Please contact support.",
+                {
+                  richColors: true,
+                }
+              );
+              setUser(null);
+              setMember(null);
+              localStorage.removeItem("user");
+              localStorage.removeItem("token");
+              localStorage.removeItem("member");
+              router.replace("/account/banned");
+              setIsLoading(false);
+              return;
+            }
             localStorage.setItem("user", JSON.stringify(newUser));
+            localStorage.setItem("member", JSON.stringify(newMember));
             param.returnUrl && router.replace(param.returnUrl.toString());
           }
         } catch (e) {
@@ -142,18 +174,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          localStorage.removeItem("member");
           router.replace("/auth/login");
           setIsLoading(false);
           return;
         }
         setIsLoading(false);
         return;
+      } else {
+        setUser(JSON.parse(userStr));
+        setMember(JSON.parse(memberStr));
+        if (member && member.isBanned) {
+          toast.error("Your account has been banned. Please contact support.", {
+            richColors: true,
+          });
+          setUser(null);
+          setMember(null);
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          localStorage.removeItem("member");
+          router.replace("/account/banned");
+          setIsLoading(false);
+          return;
+        }
       }
 
       setIsLoading(false);
     };
     checkAuth();
-  }, [router]);
+  }, [router, param.returnUrl]);
 
   // Mock login function
   const login = async (email: string, password: string) => {
@@ -190,6 +239,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setMember(newMember);
           localStorage.setItem("user", JSON.stringify(newUser));
           localStorage.setItem("token", JSON.stringify(newToken));
+          localStorage.setItem("member", JSON.stringify(newMember));
         } catch (error) {
           console.error("Error fetching user data:", error);
           reject(new Error("Failed to fetch user data"));

@@ -18,7 +18,7 @@ const products: Product[] = [
     isNew: true,
     discount: 20,
     category: "electronics",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "2",
@@ -31,7 +31,7 @@ const products: Product[] = [
     isNew: false,
     discount: 15,
     category: "electronics",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "3",
@@ -44,7 +44,7 @@ const products: Product[] = [
     isNew: false,
     discount: 0,
     category: "clothing",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "4",
@@ -57,7 +57,7 @@ const products: Product[] = [
     isNew: false,
     discount: 10,
     category: "home",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "5",
@@ -70,7 +70,7 @@ const products: Product[] = [
     isNew: true,
     discount: 0,
     category: "electronics",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "6",
@@ -83,7 +83,7 @@ const products: Product[] = [
     isNew: false,
     discount: 25,
     category: "accessories",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "7",
@@ -96,7 +96,7 @@ const products: Product[] = [
     isNew: false,
     discount: 25,
     category: "electronics",
-    quantity: 123456,
+    stock: 123456,
   },
   {
     id: "8",
@@ -109,7 +109,7 @@ const products: Product[] = [
     isNew: false,
     discount: 0,
     category: "home",
-    quantity: 123456,
+    stock: 123456,
   },
 ]
 
@@ -267,9 +267,8 @@ export async function getAllProducts(): Promise<Product[]> {
 
 export async function getLatestProducts(): Promise<Product[]> {
   const allProducts = await getAllProducts()
-  console.log("Fetched products:", allProducts)
   
-  return allProducts.filter((product) => product.isNew === true) ;
+  return allProducts.filter((product) => product.isNew === true).slice(0, 4);
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
