@@ -11,7 +11,7 @@ export interface Product {
   isNew: boolean
   discount: number
   category: string
-  quantity: number
+  stock: number
 }
 
 export interface Category {
