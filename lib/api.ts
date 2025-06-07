@@ -3,7 +3,7 @@ import { CupSoda, Wheat, Utensils, ChefHat, Scissors, Ellipsis } from "lucide-re
 
 // Import product images from assets folder
 // This makes it easy for developers to replace with real images from backend
-const ASSET_PREFIX = "/assets/products"
+const ASSET_PREFIX = "/assets"
 
 // Mock data for products
 const products: Product[] = [
@@ -121,7 +121,7 @@ const categories: Category[] = [
     description: "Finest Food Products You'll Ever Taste",
     productCount: 42,
     icon: Utensils,
-    image: `${ASSET_PREFIX}/categories/electronics.jpg`,
+    image: `${ASSET_PREFIX}/Category _ Food.png`,
   },
   {
     id: "MINUMAN",
@@ -129,7 +129,7 @@ const categories: Category[] = [
     description: "Fresh Beverages You'll Ever Find",
     productCount: 56,
     icon: CupSoda,
-    image: `${ASSET_PREFIX}/categories/clothing.jpg`,
+    image: `${ASSET_PREFIX}/Category _ Beverages.png`,
   },
   {
     id: "BAHAN_BAKU",
@@ -137,7 +137,7 @@ const categories: Category[] = [
     description: "Everything you need for your cooking",
     productCount: 38,
     icon: Wheat,
-    image: `${ASSET_PREFIX}/categories/home.jpg`,
+    image: `${ASSET_PREFIX}/Category _ Raw Stockpiles.png`,
   },
   {
     id: "KEBUTUHAN_DAPUR",
@@ -145,7 +145,7 @@ const categories: Category[] = [
     description: "Pepper, salt, and everything in between",
     productCount: 24,
     icon: ChefHat,
-    image: `${ASSET_PREFIX}/categories/books.jpg`,
+    image: `${ASSET_PREFIX}/Category _ Kitchen Supplies.png`,
   },
   {
     id: "KOSMETIK",
@@ -153,7 +153,7 @@ const categories: Category[] = [
     description: "Beauty and care products for everyone",
     productCount: 31,
     icon: Scissors,
-    image: `${ASSET_PREFIX}/categories/toys.jpg`,
+    image: `${ASSET_PREFIX}/Category _ Cosmetics.png`,
   },
   {
     id: "LAINNYA",
@@ -161,7 +161,7 @@ const categories: Category[] = [
     description: "And many more. Go find something you like",
     productCount: 18,
     icon: Ellipsis,
-    image: `${ASSET_PREFIX}/categories/wearables.jpg`,
+    image: `${ASSET_PREFIX}/Category _ Others.png`,
   },
 ]
 

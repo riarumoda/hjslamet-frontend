@@ -32,7 +32,7 @@ export default async function CategoriesPage() {
               : "/placeholder.svg?height=300&width=400";
 
             return (
-              <Card key={category.id} className="overflow-hidden">
+              <Card key={category.id} className="overflow-hidden group">
                 <CardHeader className="pb-0">
                   <CardTitle>{category.name}</CardTitle>
                   <CardDescription>{category.description}</CardDescription>
@@ -44,19 +44,14 @@ export default async function CategoriesPage() {
                         src={imageSrc || "/placeholder.svg"}
                         alt={category.name}
                         fill
-                        className="object-cover"
+                        className="object-cover transition-transform duration-300 group-hover:scale-150"
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
                     ) : (
-                      <div className="flex items-center justify-center h-full">
+                      <div className="flex items-center justify-center h-full transition-transform duration-300 group-hover:scale-110">
                         <category.icon className="h-16 w-16 text-muted-foreground" />
                       </div>
                     )}
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-sm text-muted-foreground">
-                      {category.productCount} products available
-                    </p>
                   </div>
                 </CardContent>
                 <CardFooter>
