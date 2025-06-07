@@ -1,4 +1,4 @@
-import type { Product, Category, PaymentConfirmation, Member, LoggedInUser } from "@/types"
+import type { Product, Category, PaymentConfirmation, Member, LoggedInUser, CheckoutRequest } from "@/types"
 import { CupSoda, Wheat, Utensils, ChefHat, Scissors, Ellipsis } from "lucide-react"
 
 // Import product images from assets folder
@@ -13,7 +13,7 @@ const products: Product[] = [
     description: "Premium wireless headphones with noise cancellation and long battery life.",
     price: 129000.0,
     oldPrice: 159000.0,
-    image: `${ASSET_PREFIX}/headphones.jpg`,
+    images: [`${ASSET_PREFIX}/headphones.jpg`],
     imageAlt: "Wireless Bluetooth Headphones",
     isNew: true,
     discount: 20,
@@ -26,7 +26,7 @@ const products: Product[] = [
     description: "Track your fitness goals with this advanced smart fitness tracker.",
     price: 79000.0,
     oldPrice: 99000.0,
-    image: `${ASSET_PREFIX}/fitness-tracker.jpg`,
+    images: [`${ASSET_PREFIX}/fitness-tracker.jpg`],
     imageAlt: "Smart Fitness Tracker",
     isNew: false,
     discount: 15,
@@ -39,7 +39,7 @@ const products: Product[] = [
     description: "Comfortable and eco-friendly organic cotton t-shirt.",
     price: 24000.0,
     oldPrice: null,
-    image: `${ASSET_PREFIX}/tshirt.jpg`,
+    images: [`${ASSET_PREFIX}/tshirt.jpg`],
     imageAlt: "Organic Cotton T-Shirt",
     isNew: false,
     discount: 0,
@@ -52,7 +52,7 @@ const products: Product[] = [
     description: "Durable stainless steel water bottle that keeps drinks cold for 24 hours.",
     price: 34000.0,
     oldPrice: 39000.0,
-    image: `${ASSET_PREFIX}/water-bottle.jpg`,
+    images: [`${ASSET_PREFIX}/water-bottle.jpg`],
     imageAlt: "Stainless Steel Water Bottle",
     isNew: false,
     discount: 10,
@@ -65,7 +65,7 @@ const products: Product[] = [
     description: "Fast wireless charging pad compatible with all Qi-enabled devices.",
     price: 29000.0,
     oldPrice: null,
-    image: `${ASSET_PREFIX}/charging-pad.jpg`,
+    images: [`${ASSET_PREFIX}/charging-pad.jpg`],
     imageAlt: "Wireless Charging Pad",
     isNew: true,
     discount: 0,
@@ -78,7 +78,7 @@ const products: Product[] = [
     description: "Stylish and practical leather crossbody bag with multiple compartments.",
     price: 59000.0,
     oldPrice: 79000.0,
-    image: `${ASSET_PREFIX}/crossbody-bag.jpg`,
+    images: [`${ASSET_PREFIX}/crossbody-bag.jpg`],
     imageAlt: "Leather Crossbody Bag",
     isNew: false,
     discount: 25,
@@ -91,7 +91,7 @@ const products: Product[] = [
     description: "HD security camera with motion detection and night vision.",
     price: 89000.0,
     oldPrice: 119000.0,
-    image: `${ASSET_PREFIX}/security-camera.jpg`,
+    images: [`${ASSET_PREFIX}/security-camera.jpg`],
     imageAlt: "Smart Home Security Camera",
     isNew: false,
     discount: 25,
@@ -104,7 +104,7 @@ const products: Product[] = [
     description: "Set of 4 ceramic coffee mugs in assorted colors.",
     price: 24000.0,
     oldPrice: null,
-    image: `${ASSET_PREFIX}/mug-set.jpg`,
+    images: [`${ASSET_PREFIX}/mug-set.jpg`],
     imageAlt: "Ceramic Coffee Mug Set",
     isNew: false,
     discount: 0,
@@ -402,9 +402,9 @@ export const dummyUser: LoggedInUser = {
   email: "raliya04@rarea.com",
 };
 
-export async function createOrder(orderData: any) {
+export async function createOrder(checkoutData: CheckoutRequest, token: string) {
   try {
-    return await fetchData("orders", "POST", orderData)
+    return await fetchData("transaction/checkout", "POST", checkoutData, token)
   } catch (error) {
     console.error("Failed to create order:", error)
     throw error

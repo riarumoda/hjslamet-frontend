@@ -4,7 +4,8 @@ import type React from "react";
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-import type { Product } from "@/types";
+import type { CheckoutRequest, Product } from "@/types";
+import { createOrder } from "@/lib/api";
 
 interface CartItem extends Product {
   quantity: number;

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { formatRupiah } from "@/lib/currency";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function ProductFilters() {
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [openCategories, setOpenCategories] = useState(true);
   const [openPrice, setOpenPrice] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Tambahkan state ini
@@ -36,11 +36,7 @@ export default function ProductFilters() {
 
   const handleApply = () => {
     const params = new URLSearchParams(searchParams.toString());
-    if (selectedCategory) {
-      params.set("category", selectedCategory);
-    } else {
-      params.delete("category");
-    }
+
     params.set("min", priceRange[0].toString());
     params.set("max", priceRange[1].toString());
     router.push(`/products?${params.toString()}`);
@@ -49,7 +45,16 @@ export default function ProductFilters() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Filters</h3>
-        <Button variant="outline" size="sm" className="w-full justify-start">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+          onClick={() => {
+            setPriceRange([0, 100000]);
+            setSelectedCategory(null);
+            router.replace("/products");
+          }}
+        >
           Clear All Filters
         </Button>
       </div>
@@ -72,6 +77,11 @@ export default function ProductFilters() {
                   checked={selectedCategory === category.id}
                   onCheckedChange={(checked) => {
                     setSelectedCategory(checked ? category.id : null);
+                    const params = new URLSearchParams(searchParams.toString());
+                    checked
+                      ? params.set("category", category.id)
+                      : params.delete("category");
+                    router.push(`/products?${params.toString()}`);
                   }}
                 />
                 <label
@@ -98,9 +108,9 @@ export default function ProductFilters() {
         <CollapsibleContent className="pt-2 pb-4">
           <div className="space-y-4">
             <Slider
-              defaultValue={[0, 1000000]}
-              max={1000000}
-              step={10}
+              defaultValue={[0, 100000]}
+              max={100000}
+              step={1000}
               value={priceRange}
               onValueChange={setPriceRange}
             />
