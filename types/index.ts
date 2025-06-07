@@ -6,7 +6,7 @@ export interface Product {
   description: string
   price: number
   oldPrice: number | null
-  image: string | null
+  images: string[]
   imageAlt?: string
   isNew: boolean
   discount: number
@@ -32,6 +32,21 @@ export interface Order {
   createdAt: string
   updatedAt: string
   paymentStatus: "unpaid" | "pending" | "paid" | "failed"
+}
+
+export interface CheckoutRequest {
+  member: string
+  customerAddress: string
+  totalAmount: number
+  status: "PROSES" | "DIKIRIM" | "SELESAI"
+  checkoutDetailRequests: CheckoutDetailRequest[]
+}
+
+export interface CheckoutDetailRequest {
+  productId: string
+  qty: number
+  subtotal: number
+  notes: string
 }
 
 export interface OrderItem {

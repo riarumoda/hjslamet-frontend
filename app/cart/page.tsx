@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
@@ -20,22 +20,83 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { formatRupiah } from "@/lib/currency";
-import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/hooks/use-auth";
 import { Textarea } from "@/components/ui/textarea";
+import { createOrder, getImagePath } from "@/lib/api";
+import { CheckoutDetailRequest, CheckoutRequest } from "@/types";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { getAccessToken, member, user } = useAuth();
   const [address, setAddress] = useState("");
-  const { user, member } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const close = useRef<HTMLButtonElement>(null);
+
+  const handleCheckout = async () => {
+    if (!member) {
+      toast.error("You must be logged in to checkout.", { richColors: true });
+      return;
+    }
+    if (!address || address.trim().length < 5) {
+      toast.error("Please enter a valid address.", { richColors: true });
+      return;
+    }
+    if (cart.length === 0) {
+      toast.error("Your cart is empty.", { richColors: true });
+      return;
+    }
+
+    setLoading(true);
+
+    const checkoutDetailRequests: CheckoutDetailRequest[] = cart.map(
+      (item) => ({
+        productId: item.id,
+        qty: item.quantity,
+        subtotal: item.price * item.quantity,
+        notes: "",
+      })
+    );
+
+    const checkoutRequest: CheckoutRequest = {
+      member: user ? user.id : "",
+      customerAddress: address,
+      totalAmount: cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      status: "PROSES",
+      checkoutDetailRequests,
+    };
+
+    try {
+      await createOrder(checkoutRequest, getAccessToken() || "");
+      clearCart();
+      toast.success("Checkout successful! ", {
+        richColors: true,
+        description: "Your order has been placed.",
+      });
+
+      router.push("/account/orders");
+    } catch (error) {
+      toast.error("Checkout failed! ", {
+        richColors: true,
+        description: "Please try again.",
+      });
+    } finally {
+      setLoading(false);
+      close.current?.click();
+    }
+  };
 
   const subtotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
-  const shipping = subtotal > 100 ? 0 : 10;
-  const total = subtotal + shipping;
+  const total = subtotal;
 
   if (cart.length === 0) {
     return (
@@ -81,7 +142,7 @@ export default function CartPage() {
                       <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
                         <Image
                           src={
-                            item.image ||
+                            getImagePath(item.images[0], 120, 120) ||
                             "/placeholder.svg?height=120&width=120"
                           }
                           alt={item.name}
@@ -158,12 +219,6 @@ export default function CartPage() {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>{formatRupiah(subtotal)}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span>
-                      {shipping === 0 ? "Free" : `${formatRupiah(shipping)}`}
-                    </span>
-                  </div>
                   <Separator />
                   <div className="flex items-center justify-between font-medium">
                     <span>Total</span>
@@ -178,69 +233,66 @@ export default function CartPage() {
                     />
                   </div>
                   <Dialog>
-                    <form>
-                      <DialogTrigger asChild>
-                        <Button className="w-full" size="lg">
-                          Checkout
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Confirm Checkout</DialogTitle>
-                          <DialogDescription>
-                            Before you proceed, please confirm your details and
-                            address. Ensure everything is correct to avoid any
-                            issues with your order.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4">
-                          <div className="grid gap-3">
-                            <p className="text-yellow-500 font-bold">
-                              Must Do:
-                            </p>
-                            <Label>
-                              &#8226; Make sure you're address are right!
-                            </Label>
-                          </div>
-                          <div className="grid gap-3">
-                            <p className="text-blue-500 font-bold">Info:</p>
-
-                            <Label>
-                              &#8226; System will notify shop staff after you
-                              click "Confirm Checkout" button
-                            </Label>
-
-                            <Label>
-                              &#8226; Currently available payment method is COD,
-                              but our staff will also bring QRIS code for you to
-                              pay via QRIS at your address
-                            </Label>
-
-                            <Label>
-                              &#8226; You can track your order status in your
-                              account page
-                            </Label>
-                          </div>
-                          <div className="grid gap-3">
-                            <p className="text-red-500 font-bold">Warning:</p>
-
-                            <Label>
-                              &#8226; Any unwanted behavior such as harrassing
-                              our staff, cancelling orders after confirming
-                              orders, or not paying after receiving the order,
-                              etc will not be tolerated and result in a ban from
-                              our system
-                            </Label>
-                          </div>
+                    <DialogTrigger asChild ref={close}>
+                      <Button className="w-full" size="lg">
+                        Checkout
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Confirm Checkout</DialogTitle>
+                        <DialogDescription>
+                          Before you proceed, please confirm your details and
+                          address. Ensure everything is correct to avoid any
+                          issues with your order.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4">
+                        <div className="grid gap-3">
+                          <p className="text-yellow-500 font-bold">Must Do:</p>
+                          <Label>
+                            &#8226; Make sure you're address are right!
+                          </Label>
                         </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button variant="outline">Wait A Minute!</Button>
-                          </DialogClose>
-                          <Button type="submit">Confirm Checkout</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </form>
+                        <div className="grid gap-3">
+                          <p className="text-blue-500 font-bold">Info:</p>
+
+                          <Label>
+                            &#8226; System will notify shop staff after you
+                            click "Confirm Checkout" button
+                          </Label>
+
+                          <Label>
+                            &#8226; Currently available payment method is COD,
+                            but our staff will also bring QRIS code for you to
+                            pay via QRIS at your address
+                          </Label>
+
+                          <Label>
+                            &#8226; You can track your order status in your
+                            account page
+                          </Label>
+                        </div>
+                        <div className="grid gap-3">
+                          <p className="text-red-500 font-bold">Warning:</p>
+
+                          <Label>
+                            &#8226; Any unwanted behavior such as harrassing our
+                            staff, cancelling orders after confirming orders, or
+                            not paying after receiving the order, etc will not
+                            be tolerated and result in a ban from our system
+                          </Label>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="outline">Wait A Minute!</Button>
+                        </DialogClose>
+                        <Button onClick={handleCheckout} disabled={loading}>
+                          {loading ? "Processing..." : "Confirm Checkout"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
                   </Dialog>
                 </div>
               </div>
