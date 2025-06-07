@@ -81,7 +81,7 @@ export default function ProductFilters() {
                     checked
                       ? params.set("category", category.id)
                       : params.delete("category");
-                    router.push(`/products?${params.toString()}`);
+                    router.push(`/products?${params.toString().toLowerCase()}`);
                   }}
                 />
                 <label
