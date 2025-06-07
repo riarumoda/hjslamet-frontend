@@ -103,7 +103,7 @@ export default function ProductPage() {
   }
 
   // Get image paths with fallbacks
-  const mainImageSrc = getImagePath(product.image, 600, 600);
+  const mainImageSrc = getImagePath(product.images[0], 600, 600);
   const imageAlt = product.imageAlt || product.name;
 
   return (
@@ -136,7 +136,7 @@ export default function ProductPage() {
                   className="relative aspect-square overflow-hidden rounded-lg bg-muted"
                 >
                   <Image
-                    src={mainImageSrc || "/placeholder.svg"}
+                    src={product.images[i] || "/placeholder.svg"}
                     alt={`${product.name} thumbnail ${i}`}
                     fill
                     className="object-cover"
