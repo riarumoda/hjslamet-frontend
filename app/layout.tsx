@@ -15,8 +15,8 @@ import ToastContainer from "@/components/ToastContainer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "H. Slamet - Quality Products",
-  description: "Shop quality products at H. Slamet",
+  title: "H. Slamet - Stockpile Shop",
+  description: "Shop quality of goods and stockpiles at H. Slamet Shop",
 };
 
 export default function RootLayout({
