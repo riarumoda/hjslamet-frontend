@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, member, isLoading, updateProfile, changePassword } = useAuth();
+  const { user, member, isLoading, logout, updateProfile, changePassword } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -50,6 +50,7 @@ export default function ProfilePage() {
 
     try {
       await updateProfile({ name, email, pnumber: phone });
+      console.log(updateProfile({ name, email, pnumber: phone }));
       toast.success("Your profile information has been updated successfully.");
     } catch (error) {
       toast.error(
@@ -221,7 +222,11 @@ export default function ProfilePage() {
             </form>
           </CardContent>
         </Card>
+
       </div>
+      <div className="flex justify-center mt-15">
+          <button onClick={logout} type="button" className="w-50 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Logout</button>
+        </div>
     </div>
   );
 }

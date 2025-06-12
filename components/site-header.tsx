@@ -140,30 +140,12 @@ export default function SiteHeader() {
 
           {user ? (
             <div className="relative group">
+              <Link href="/account/profile">
               <Button variant="ghost" size="icon">
                 <User className="h-5 w-5" />
                 <span className="sr-only">Account</span>
               </Button>
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-background border hidden group-hover:block">
-                <Link
-                  href="/account"
-                  className="block px-4 py-2 text-sm hover:bg-muted"
-                >
-                  My Account
-                </Link>
-                <Link
-                  href="/account/orders"
-                  className="block px-4 py-2 text-sm hover:bg-muted"
-                >
-                  My Orders
-                </Link>
-                <button
-                  onClick={logout}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-muted"
-                >
-                  Logout
-                </button>
-              </div>
+              </Link>
             </div>
           ) : (
             <Link href="/auth/login">

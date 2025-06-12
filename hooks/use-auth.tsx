@@ -50,13 +50,13 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   member: null, // Assuming Member is a type that extends User
   isLoading: true,
-  login: async () => {},
+  login: async () => { },
   loginAdmin: async () => ({ success: false, message: "Not implemented" }),
   register: async () => ({ success: false, message: "Not implemented" }),
-  logout: () => {},
-  updateProfile: async () => {},
-  changePassword: async () => {},
-  deleteAccount: async () => {},
+  logout: () => { },
+  updateProfile: async () => { },
+  changePassword: async () => { },
+  deleteAccount: async () => { },
   getAccessToken: () => undefined,
   getRefreshToken: () => undefined,
 });
@@ -361,8 +361,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Logout function
   const logout = async () => {
-    const res = await fetchData("auth/logout", "POST", null, getRefreshToken());
-    if (!res.success) {
+    const res = await fetchData("auth/logout", "POST", {
+      token: getAccessToken()
+    }, getRefreshToken());
+    console.log("Masuk")
+    console.log(res);
+    if (!res) {
       console.error("Logout failed:", res.message);
       return;
     }
@@ -374,17 +378,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Update profile function
   const updateProfile = async (data: Partial<Member>) => {
     // In a real app, this would make an API call to your Java backend
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (user) {
-          const updatedUser = { ...user, ...data };
-          setUser(updatedUser);
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-          resolve();
-        } else {
-          reject(new Error("No user logged in"));
-        }
-      }, 1000);
+    return new Promise<void>(async (resolve, reject) => {
+      // Simulate successful login
+      try {
+        const newUser2 = {
+          name: data.name,
+          email: data.email,
+          phoneNumber: data.pnumber,
+        };
+
+        var response = await fetchData("user/update-profile", "PUT", newUser2, getAccessToken());
+
+        var responseUser = await fetchData("user/me", "GET", null, getAccessToken());
+        const newUser = {
+          id: responseUser.id,
+          name: responseUser.name,
+          email: responseUser.email,
+        };
+        setUser(newUser);
+        const newMember: Member = {
+          name: responseUser.name,
+          email: responseUser.email,
+          pnumber: responseUser.phoneNumber || "",
+          address: responseUser.address || "",
+          isBanned: responseUser.isBanned || false,
+        };
+        setMember(newMember);
+        localStorage.setItem("user", JSON.stringify(newUser));
+        localStorage.setItem("member", JSON.stringify(newMember));
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        reject(new Error("Failed to fetch user data"));
+        return;
+      }
+      resolve();
     });
   };
 
@@ -399,6 +426,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Simulate password change validation
         if (currentPassword && newPassword) {
           // In a real app, you would validate the current password
+          
           resolve();
         } else {
           reject(new Error("Invalid password data"));
