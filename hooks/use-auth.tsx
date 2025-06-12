@@ -1,7 +1,7 @@
 "use client";
 
 import { fetchData } from "@/lib/api";
-import { Member, RegisterRequest } from "@/types";
+import { Member, RegisterRequest, Token } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import type React from "react";
 
@@ -13,12 +13,6 @@ interface User {
   id: string;
   name: string;
   email: string;
-}
-
-interface Token {
-  token: string;
-  refreshToken: string;
-  tokenExpiration: number; // Timestamp in milliseconds
 }
 
 interface AuthContextType {
@@ -118,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!token || isTokenExpired(tokenExpiration)) {
         try {
-          const response = await fetchData("auth/refresh", "POST", {
+          const response = await fetchData("auth/refresh", false, "POST", {
             refreshToken: refreshToken,
           });
           if (response) {
@@ -128,12 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               tokenExpiration: response.expiration,
             };
             localStorage.setItem("token", JSON.stringify(newToken));
-            const responseUser = await fetchData(
-              "user/me",
-              "GET",
-              null,
-              newToken.token
-            );
+            const responseUser = await fetchData("user/me", true, "GET", null);
             const newUser: User = {
               id: responseUser.id,
               name: responseUser.name,
@@ -211,7 +200,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Simulate successful login
       if (email && password) {
         try {
-          var response = await fetchData("auth/login/member", "POST", {
+          var response = await fetchData("auth/login/member", false, "POST", {
             email: email,
             password: password,
           });
@@ -220,9 +209,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             refreshToken: response.refreshToken,
             tokenExpiration: response.expiration,
           };
-          const token = response.token;
+          localStorage.setItem("token", JSON.stringify(newToken));
 
-          var responseUser = await fetchData("user/me", "GET", null, token);
+          var responseUser = await fetchData("user/me", true, "GET", null);
           const newUser = {
             id: responseUser.id,
             name: responseUser.name,
@@ -238,7 +227,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           setMember(newMember);
           localStorage.setItem("user", JSON.stringify(newUser));
-          localStorage.setItem("token", JSON.stringify(newToken));
           localStorage.setItem("member", JSON.stringify(newMember));
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -270,6 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           const response = await fetchData(
             "auth/register/member",
+            false,
             "POST",
             newUser
           );
@@ -314,7 +303,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Mengirim request login ke backend
-      const response = await fetchData("auth/login/admin", "POST", {
+      const response = await fetchData("auth/login/admin", false, "POST", {
         email,
         password,
       });
@@ -326,10 +315,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      const token = response.token;
-
       // Mengambil data user setelah login berhasil
-      const responseUser = await fetchData("user/me-admin", "GET", null, token);
+      const responseUser = await fetchData("user/me-admin", true, "GET", null);
 
       const newUser = {
         id: responseUser.id,
@@ -361,7 +348,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Logout function
   const logout = async () => {
-    const res = await fetchData("auth/logout", "POST", null, getRefreshToken());
+    const res = await fetchData("auth/logout", false, "POST", {
+      token: getRefreshToken(),
+    });
     if (!res.success) {
       console.error("Logout failed:", res.message);
       return;

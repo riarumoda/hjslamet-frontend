@@ -24,14 +24,13 @@ export interface Category {
 }
 
 export interface Order {
-  id: string
-  customerId: string
+  invoiceId: string
+  memberId: string
   items: OrderItem[]
   total: number
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  status: "PROSES" | "DIKIRIM" | "SELESAI"
   createdAt: string
   updatedAt: string
-  paymentStatus: "unpaid" | "pending" | "paid" | "failed"
 }
 
 export interface CheckoutRequest {
@@ -51,7 +50,7 @@ export interface CheckoutDetailRequest {
 
 export interface OrderItem {
   productId: string
-  name: string
+  productName: string
   price: number
   quantity: number
 }
@@ -101,4 +100,10 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+}
+
+export interface Token {
+  token: string;
+  refreshToken: string;
+  tokenExpiration: number; // Timestamp in milliseconds
 }
