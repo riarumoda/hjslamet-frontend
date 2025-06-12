@@ -30,7 +30,7 @@ import { toast } from "sonner";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
-  const { getAccessToken, member, user } = useAuth();
+  const { member, user } = useAuth();
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -73,7 +73,7 @@ export default function CartPage() {
     };
 
     try {
-      await createOrder(checkoutRequest, getAccessToken() || "");
+      await createOrder(checkoutRequest);
       clearCart();
       toast.success("Checkout successful! ", {
         richColors: true,

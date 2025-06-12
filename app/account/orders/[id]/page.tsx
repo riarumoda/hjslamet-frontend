@@ -1,94 +1,91 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Download, Truck } from "lucide-react"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Download, Truck } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { useAuth } from "@/hooks/use-auth"
-import type { Order } from "@/types"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/use-auth";
+import type { Order } from "@/types";
+import { fetchData, getOrderSummaryById } from "@/lib/api";
 
-export default function OrderDetailsPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const { user, isLoading } = useAuth()
-  const [order, setOrder] = useState<Order | null>(null)
-  const [isLoadingOrder, setIsLoadingOrder] = useState(true)
+export default function OrderDetailsPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isLoadingOrder, setIsLoadingOrder] = useState(true);
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push(`/auth/login?returnUrl=/account/orders/${params.id}`)
+      router.push(`/auth/login?returnUrl=/account/orders/${params.id}`);
     }
-  }, [user, isLoading, router, params.id])
+  }, [user, isLoading, router, params.id]);
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        // In a real app, this would fetch from your API
-        await new Promise((resolve) => setTimeout(resolve, 800))
+        const res = await getOrderSummaryById(user?.id || "");
 
-        // Mock data
-        const mockOrder: Order = {
-          id: params.id,
-          customerId: "user-1",
-          items: [
-            { productId: "1", name: "Wireless Bluetooth Headphones", price: 129.99, quantity: 1 },
-            { productId: "4", name: "Stainless Steel Water Bottle", price: 34.99, quantity: 1 },
-          ],
-          total: 164.98,
-          status: "delivered",
-          createdAt: "2023-05-15T10:30:00Z",
-          updatedAt: "2023-05-18T14:20:00Z",
-          paymentStatus: "paid",
-        }
+        const mockOrder: Order = res.find(
+          (order: Order) => order.invoiceId === params.id
+        );
 
-        setOrder(mockOrder)
+        setOrder(mockOrder);
       } catch (error) {
-        console.error("Error fetching order:", error)
+        console.error("Error fetching order:", error);
       } finally {
-        setIsLoadingOrder(false)
+        setIsLoadingOrder(false);
       }
-    }
+    };
 
     if (user) {
-      fetchOrder()
+      fetchOrder();
     }
-  }, [user, params.id])
+  }, [user, params.id]);
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case "delivered":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-      case "shipped":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
-      case "processing":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+      case "SELESAI":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case "DIKIRIM":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      case "PROSES":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400";
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    }).format(date)
-  }
+    }).format(date);
+  };
 
   if (isLoading || isLoadingOrder) {
     return (
       <div className="container py-12 flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
-    )
+    );
   }
 
   if (!user || !order) {
@@ -102,7 +99,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
           </Button>
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -118,17 +115,21 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
 
       <div className="flex flex-col gap-2 mb-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Order #{order.id}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Order #{order.invoiceId}
+          </h1>
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Download Invoice
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
+          <p className="text-muted-foreground">
+            Placed on {formatDate(order.createdAt)}
+          </p>
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
-              order.status,
+              order.status
             )}`}
           >
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -146,17 +147,24 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             <CardContent>
               <div className="space-y-4">
                 {order.items.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center">
+                  <div
+                    key={index}
+                    className="flex justify-between items-center"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 bg-muted rounded"></div>
                       <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                        <p className="font-medium">{item.productName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Qty: {item.quantity}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">${item.price.toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -176,8 +184,12 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 </div>
                 <div className="mb-8">
                   <h3 className="font-medium">Order Placed</h3>
-                  <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
-                  <p className="mt-2">Your order has been placed successfully.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDate(order.createdAt)}
+                  </p>
+                  <p className="mt-2">
+                    Your order has been placed successfully.
+                  </p>
                 </div>
 
                 <div className="absolute left-0 top-24 w-6 h-6 rounded-full bg-primary flex items-center justify-center -translate-x-1/2">
@@ -186,7 +198,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 <div className="mb-8">
                   <h3 className="font-medium">Payment Confirmed</h3>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(new Date(new Date(order.createdAt).getTime() + 1000 * 60 * 30).toISOString())}
+                    {formatDate(
+                      new Date(
+                        new Date(order.createdAt).getTime() + 1000 * 60 * 30
+                      ).toISOString()
+                    )}
                   </p>
                   <p className="mt-2">Your payment has been confirmed.</p>
                 </div>
@@ -197,9 +213,16 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 <div className="mb-8">
                   <h3 className="font-medium">Order Shipped</h3>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(new Date(new Date(order.createdAt).getTime() + 1000 * 60 * 60 * 24).toISOString())}
+                    {formatDate(
+                      new Date(
+                        new Date(order.createdAt).getTime() +
+                          1000 * 60 * 60 * 24
+                      ).toISOString()
+                    )}
                   </p>
-                  <p className="mt-2">Your order has been shipped via Express Delivery.</p>
+                  <p className="mt-2">
+                    Your order has been shipped via Express Delivery.
+                  </p>
                   <div className="mt-2 p-3 bg-muted rounded-md flex items-center gap-3">
                     <Truck className="h-5 w-5 text-primary" />
                     <div>
@@ -214,8 +237,12 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 </div>
                 <div>
                   <h3 className="font-medium">Order Delivered</h3>
-                  <p className="text-sm text-muted-foreground">{formatDate(order.updatedAt)}</p>
-                  <p className="mt-2">Your order has been delivered successfully.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDate(order.updatedAt)}
+                  </p>
+                  <p className="mt-2">
+                    Your order has been delivered successfully.
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -282,7 +309,9 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status</span>
-                  <span className="text-green-600 dark:text-green-400">Paid</span>
+                  <span className="text-green-600 dark:text-green-400">
+                    Paid
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -296,5 +325,5 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         </div>
       </div>
     </div>
-  )
+  );
 }

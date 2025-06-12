@@ -1,4 +1,4 @@
-import type { Product, Category, PaymentConfirmation, Member, LoggedInUser, CheckoutRequest } from "@/types"
+import type { Product, Category, PaymentConfirmation, Member, LoggedInUser, CheckoutRequest, Token } from "@/types"
 import { CupSoda, Wheat, Utensils, ChefHat, Scissors, Ellipsis } from "lucide-react"
 
 // Import product images from assets folder
@@ -273,7 +273,7 @@ export async function getLatestProducts(): Promise<Product[]> {
 
 export async function getProductById(id: string): Promise<Product | undefined> {
   try {
-    return await fetchData("products/one/"+id)
+    return await fetchData("products/one/"+id, false)
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     return undefined
@@ -298,7 +298,7 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   try {
-    return await fetchData("products/category/"+categoryId)
+    return await fetchData("products/category/"+categoryId, false)
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     return []
@@ -307,7 +307,7 @@ export async function getProductsByCategory(categoryId: string): Promise<Product
 
 export async function getProductsByPriceRange(min: number, max: number): Promise<Product[]> {
   try {
-    return await fetchData("products/price/"+min.toString()+"/"+max.toString())
+    return await fetchData("products/price/"+min.toString()+"/"+max.toString(), false)
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     return []
@@ -316,7 +316,7 @@ export async function getProductsByPriceRange(min: number, max: number): Promise
 
 export async function getProductsByName(name: string): Promise<Product[]> {
   try {
-    return await fetchData("products/"+name);
+    return await fetchData("products/"+name, false);
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     return []
@@ -330,17 +330,41 @@ export async function getMembers(): Promise<Member[]> {
 }
 
 // Function to connect to Java backend
-export async function fetchData(endpoint: string, method = "GET", payload?: any, token?: string) {
+export async function fetchData(endpoint: string,  needToken: boolean, method = "GET", payload?: any,) {
   // Replace with your actual Java backend URL
   const JAVA_BACKEND_URL = process.env.JAVA_BACKEND_URL || "http://localhost:8080/api"
 
+  let tokenObj: Token | undefined;
+  if (needToken) {
+    tokenObj = JSON.parse(localStorage.getItem('token') || '{}') as Token;
+
+    // 1️⃣ cek expired
+    if (Date.now() >= tokenObj.tokenExpiration) {
+      const refresh = await fetch('/auth/refresh', {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken: tokenObj.refreshToken })
+      }).then(r => r.json()).catch(e => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('member');
+        console.error("Failed to refresh token:", e);
+        return { error: true, message: "Failed to refresh token", status: 500 };
+      });
+      tokenObj = {
+        token: refresh.token,
+        refreshToken: refresh.refreshToken,
+        tokenExpiration: refresh.expiration
+      };
+      localStorage.setItem('token', JSON.stringify(tokenObj));
+    }
+  }
   try {
     const response = await fetch(`${JAVA_BACKEND_URL}/${endpoint}`, {
       method,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(needToken && tokenObj ? { Authorization: `Bearer ${tokenObj.token}` } : {}),
       },
       body: payload ? JSON.stringify(payload) : undefined,
     })
@@ -363,7 +387,7 @@ export async function fetchData(endpoint: string, method = "GET", payload?: any,
 export async function fetchProductsFromJavaBackend() {
   try {
     // This would be replaced with an actual call to your Java backend
-    return await fetchData("products")
+    return await fetchData("products", false)
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     // Fallback to mock data if Java backend is not available
@@ -375,7 +399,7 @@ export async function fetchProductsFromJavaBackend() {
 export async function fetchAuthLoginFromJavaBackend() {
   try {
     // This would be replaced with an actual call to your Java backend
-    return await fetchData("auth/login", "POST")
+    return await fetchData("auth/login", false, "POST")
   } catch (error) {
     console.error("Failed to fetch login from Java backend:", error)
     // Fallback to mock data if Java backend is not available
@@ -387,7 +411,7 @@ export async function fetchAuthLoginFromJavaBackend() {
 export async function fetchAuthRegisterFromJavaBackend() {
   try {
     // This would be replaced with an actual call to your Java backend
-    return await fetchData("auth/register", "POST")
+    return await fetchData("auth/register", false, "POST")
   } catch (error) {
     console.error("Failed to fetch register from Java backend:", error)
     // Fallback to mock data if Java backend is not available
@@ -402,11 +426,20 @@ export const dummyUser: LoggedInUser = {
   email: "raliya04@rarea.com",
 };
 
-export async function createOrder(checkoutData: CheckoutRequest, token: string) {
+export async function createOrder(checkoutData: CheckoutRequest) {
   try {
-    return await fetchData("transaction/checkout", "POST", checkoutData, token)
+    return await fetchData("transaction/checkout", true, "POST", checkoutData)
   } catch (error) {
     console.error("Failed to create order:", error)
+    throw error
+  }
+}
+
+export async function getOrderSummaryById(memberId: string) {
+  try {
+    return await fetchData("transaction/orders/"+memberId, true, "GET", undefined)
+  } catch (error) {
+    console.error("Failed to fetch order summary:", error)
     throw error
   }
 }
