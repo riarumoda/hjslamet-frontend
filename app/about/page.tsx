@@ -103,17 +103,18 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold mb-6">Our Team</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[
-              { name: "John Doe", position: "Founder & CEO" },
-              { name: "Jane Smith", position: "Operations Manager" },
-              { name: "Michael Johnson", position: "Product Specialist" },
-              { name: "Sarah Williams", position: "Customer Service Lead" },
+              { name: "I GEDE KRISNA GANESHA WIDHIARTA", nim: "103012300088" },
+              { name: "RAZAQ FARHAN", nim: "103012300322" },
+              { name: "DERIL DIAZ", nim: "103012300074" },
+              { name: "I PUTU JUSTINE BUDI WIJAYA", nim: "103012300361" },
+              { name: "ZIYAD FATHIR AL BIAROZA", nim: "103012300455" }
             ].map((member, index) => (
               <Card key={index}>
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center text-center">
                     <div className="w-24 h-24 rounded-full bg-muted mb-4"></div>
                     <h3 className="font-medium">{member.name}</h3>
-                    <p className="text-sm text-muted-foreground">{member.position}</p>
+                    <p className="text-sm text-muted-foreground">{member.nim}</p>
                   </div>
                 </CardContent>
               </Card>

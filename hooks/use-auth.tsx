@@ -31,6 +31,9 @@ interface AuthContextType {
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   updateProfile: (data: Partial<Member>) => Promise<void>;
+  updateAddress: (
+    address: string
+  ) => Promise<void>;
   changePassword: (
     currentPassword: string,
     newPassword: string
@@ -49,6 +52,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => ({ success: false, message: "Not implemented" }),
   logout: () => { },
   updateProfile: async () => { },
+  updateAddress: async () => { },
   changePassword: async () => { },
   deleteAccount: async () => { },
   getAccessToken: () => undefined,
@@ -131,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const newMember: Member = {
               name: responseUser.name,
               email: responseUser.email,
-              pnumber: responseUser.phone || "",
+              pnumber: responseUser.phoneNumber || "",
               address: responseUser.address || "",
               isBanned: responseUser.isBanned || false,
             };
@@ -221,7 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const newMember: Member = {
             name: responseUser.name,
             email: responseUser.email,
-            pnumber: responseUser.phone || "",
+            pnumber: responseUser.phoneNumber || "",
             address: responseUser.address || "",
             isBanned: responseUser.isBanned || false,
           };
@@ -351,13 +355,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await fetchData("auth/logout", false, "POST", {
       token: getRefreshToken(),
     });
-    if (!res.success) {
+    if (!res) {
       console.error("Logout failed:", res.message);
       return;
     }
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("member");
+    localStorage.removeItem("cart");
+
+    router.replace("/auth/login");
+    toast.success("You have been logged out successfully.", {
+      richColors: true,
+      position: "top-center",
+    });
   };
 
   // Update profile function
@@ -372,9 +384,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           phoneNumber: data.pnumber,
         };
 
-        var response = await fetchData("user/update-profile", "PUT", newUser2, getAccessToken());
+        const response = await fetchData("user/update-profile", true, "PUT", newUser2);
 
-        var responseUser = await fetchData("user/me", "GET", null, getAccessToken());
+        var responseUser = await fetchData("user/me", true, "GET", null);
         const newUser = {
           id: responseUser.id,
           name: responseUser.name,
@@ -400,23 +412,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateAddress = async (
+    address: string
+  ) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+
+        const response = await fetchData("user/update-address", true, "PUT", {
+          address: address
+        });
+        
+        var responseUser = await fetchData("user/me", true, "GET", null);
+        const newUser = {
+          id: responseUser.id,
+          name: responseUser.name,
+          email: responseUser.email,
+        };
+        setUser(newUser);
+        const newMember: Member = {
+          name: responseUser.name,
+          email: responseUser.email,
+          pnumber: responseUser.phoneNumber || "",
+          address: responseUser.address || "",
+          isBanned: responseUser.isBanned || false,
+        };
+        setMember(newMember);
+        localStorage.setItem("user", JSON.stringify(newUser));
+        localStorage.setItem("member", JSON.stringify(newMember));
+
+      } catch (error) {
+        console.error("Error changing user data:", error);
+        reject(new Error("Failed to change user data"));
+        return;
+      }
+      resolve();
+    });
+  }
+
   // Change password function
   const changePassword = async (
     currentPassword: string,
     newPassword: string
   ) => {
     // In a real app, this would make an API call to your Java backend
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate password change validation
-        if (currentPassword && newPassword) {
-          // In a real app, you would validate the current password
-          
-          resolve();
-        } else {
-          reject(new Error("Invalid password data"));
-        }
-      }, 1000);
+    return new Promise<void>(async (resolve, reject) => {
+      if (!currentPassword || !newPassword) {
+        return {
+          success: false,
+          message: "Password must not be empty",
+        };
+      }
+      try {
+        const response = await fetchData("user/update-password", true, "PUT", {
+          oldPassword: currentPassword,
+          password: newPassword
+        });
+        logout();
+      } catch (error) {
+        console.error("Error changing user data:", error);
+        reject(new Error("Failed to change user data"));
+        return;
+      }
+      resolve();
     });
   };
 
@@ -476,6 +533,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginAdmin,
         logout,
         updateProfile,
+        updateAddress,
         changePassword,
         deleteAccount,
         getAccessToken,
