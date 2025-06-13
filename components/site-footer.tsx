@@ -93,7 +93,7 @@ export default function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/about"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Privacy Policy
@@ -101,7 +101,7 @@ export default function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/about"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Terms of Service
