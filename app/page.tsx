@@ -11,7 +11,10 @@ export default async function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted flex flex-col items-center justify-center">
+      <section
+      className="bg-cover bg-no-repeat w-full py-12 md:py-24 lg:py-32 bg-muted flex flex-col items-center justify-center"
+      style={{ backgroundImage: "url('assets/shop.jpg')" }}
+      >
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="flex flex-col justify-center space-y-4">
@@ -39,9 +42,9 @@ export default async function Home() {
               </div>
             </div>
             <div className="flex justify-center">
-              <div className="relative w-full h-[350px] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex items-center justify-center">
+              <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex items-center justify-center">
                 <img
-                  className="relative h-full w-full rounded-lg text-gray-400"
+                  className="relative rounded-lg h-full w-full object-cover text-gray-400"
                   src="assets/shop.jpg"
                 />
                 <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-background px-4 py-2 rounded-full shadow-lg">
