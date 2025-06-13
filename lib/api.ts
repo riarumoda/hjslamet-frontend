@@ -192,8 +192,13 @@ export async function getAllProducts(): Promise<Product[]> {
   return await fetchProductsFromJavaBackend()
 }
 
+export async function getLandingProducts(): Promise<Product[]> {
+  // Simulate API call to Java backend
+  return await fetchProductsLandingFromJavaBackend();
+}
+
 export async function getLatestProducts(): Promise<Product[]> {
-  const allProducts = await getAllProducts()
+  const allProducts = await getLandingProducts()
   
   return allProducts.filter((product) => product.isNew === true).slice(0, 4);
 }
@@ -270,14 +275,16 @@ export async function fetchData(endpoint: string,  needToken: boolean, method = 
     tokenObj = JSON.parse(localStorage.getItem('token') || '{}') as Token;
 
     // 1️⃣ cek expired
-    if (Date.now() >= tokenObj.tokenExpiration) {
+    if (Date.now() >= tokenObj.tokenExpiration ) {
       const refresh = await fetch('/auth/refresh', {
         method: 'POST',
         body: JSON.stringify({ refreshToken: tokenObj.refreshToken })
       }).then(r => r.json()).catch(e => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('member');
+
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('member');
+        
         toast.error("Failed to refresh token. Please log in again.", {description: "Your session has expired. Please log in again.", richColors: true});
         return { error: true, message: "Failed to refresh token", status: 500 };
       });
@@ -321,6 +328,17 @@ export async function fetchProductsFromJavaBackend() {
     return await fetchData("products/admin", true)
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
+    // Fallback to mock data if Java backend is not available
+    return []
+  }
+}
+
+export async function fetchProductsLandingFromJavaBackend() {
+  try {
+    // This would be replaced with an actual call to your Java backend
+    return await fetchData("products", false)
+  } catch (error) {
+    console.error("Failed to fetch landing products from Java backend:", error)
     // Fallback to mock data if Java backend is not available
     return []
   }
