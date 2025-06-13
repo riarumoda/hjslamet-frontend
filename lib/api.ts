@@ -1,5 +1,6 @@
 import type { Product, Category, PaymentConfirmation, Member, LoggedInUser, CheckoutRequest, Token } from "@/types"
 import { CupSoda, Wheat, Utensils, ChefHat, Scissors, Ellipsis } from "lucide-react"
+import {toast} from "sonner"
 
 // Import product images from assets folder
 // This makes it easy for developers to replace with real images from backend
@@ -277,7 +278,7 @@ export async function fetchData(endpoint: string,  needToken: boolean, method = 
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('member');
-        console.error("Failed to refresh token:", e);
+        toast.error("Failed to refresh token. Please log in again.", {description: "Your session has expired. Please log in again.", richColors: true});
         return { error: true, message: "Failed to refresh token", status: 500 };
       });
       tokenObj = {
@@ -303,7 +304,7 @@ export async function fetchData(endpoint: string,  needToken: boolean, method = 
       if (response.status === 401) {
         return { error: true, message: "Unauthorized", status: 401 };
       }
-      throw new Error(`Error: ${response.status} - ${response.statusText}`)
+      throw new Error(`Error: ${response.status} - ${response.json().then((data) => data.message || data.details || "Unknown error")}`);
     }
 
     return await response.json()
@@ -374,17 +375,3 @@ export async function getOrderSummaryById(memberId: string) {
   }
 }
 
-export async function submitPaymentConfirmation(data: PaymentConfirmation) {
-  // Simulate API call to Java backend
-  await delay(1000)
-
-  // In a real app, this would send the data to your Java backend
-  console.log("Payment confirmation submitted:", data)
-
-  // Return a mock response
-  return {
-    success: true,
-    message: "Payment confirmation received",
-    confirmationId: "CONF-" + Date.now(),
-  }
-}

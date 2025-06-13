@@ -28,7 +28,7 @@ export interface Order {
   memberId: string
   items: OrderItem[]
   total: number
-  status: "PROSES" | "DIKIRIM" | "SELESAI"
+  status: "PROSES" | "DIKIRIM" | "SELESAI" | "DIBATALKAN"
   createdAt: string
   updatedAt: string
 }

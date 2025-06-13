@@ -32,9 +32,7 @@ interface AuthContextType {
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   updateProfile: (data: Partial<Member>) => Promise<void>;
-  updateAddress: (
-    address: string
-  ) => Promise<void>;
+  updateAddress: (address: string) => Promise<void>;
   changePassword: (
     currentPassword: string,
     newPassword: string
@@ -49,14 +47,14 @@ const AuthContext = createContext<AuthContextType>({
   admin: null,
   member: null, // Assuming Member is a type that extends User
   isLoading: true,
-  login: async () => { },
+  login: async () => {},
   loginAdmin: async () => ({ success: false, message: "Not implemented" }),
   register: async () => ({ success: false, message: "Not implemented" }),
-  logout: () => { },
-  updateProfile: async () => { },
-  updateAddress: async () => { },
-  changePassword: async () => { },
-  deleteAccount: async () => { },
+  logout: () => {},
+  updateProfile: async () => {},
+  updateAddress: async () => {},
+  changePassword: async () => {},
+  deleteAccount: async () => {},
   getAccessToken: () => undefined,
   getRefreshToken: () => undefined,
 });
@@ -82,13 +80,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const memberStr = localStorage.getItem("member");
       const adminStr = localStorage.getItem("admin");
 
-      // Jika belum pernah login, jangan redirect atau tampilkan error
       if (!tokenStr || !userStr || !memberStr || !adminStr) {
         setIsLoading(false);
         return;
       }
 
-      if (member && member.banned) {
+      const parsedUser = JSON.parse(userStr);
+      const parsedMember = JSON.parse(memberStr);
+
+      if (parsedMember && parsedMember.banned) {
         toast.error("Your account has been banned. Please contact support.", {
           richColors: true,
         });
@@ -110,6 +110,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast.error("Your session has expired. Please log in again.", {
           richColors: true,
         });
+        setUser(null);
+        setMember(null);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("member");
@@ -120,6 +122,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { token, refreshToken, tokenExpiration } = tokenData;
 
+      if (!token || !refreshToken || !tokenExpiration) {
+        toast.error("Your session has expired. Please log in again.", {
+          richColors: true,
+        });
+        setUser(null);
+        setMember(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("member");
+        router.replace("/auth/login");
+        setIsLoading(false);
+        return;
+      }
+      setUser(parsedUser);
+      setMember(parsedMember);
       if (!token || isTokenExpired(tokenExpiration)) {
         try {
           const response = await fetchData("auth/refresh", false, "POST", {
@@ -391,6 +408,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setUser(null);
+    setMember(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.removeItem("member");
@@ -415,7 +433,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           phoneNumber: data.pnumber,
         };
 
-        const response = await fetchData("user/update-profile", true, "PUT", newUser2);
+        const response = await fetchData(
+          "user/update-profile",
+          true,
+          "PUT",
+          newUser2
+        );
 
         var responseUser = await fetchData("user/me", true, "GET", null);
         const newUser = {
@@ -443,16 +466,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const updateAddress = async (
-    address: string
-  ) => {
+  const updateAddress = async (address: string) => {
     return new Promise<void>(async (resolve, reject) => {
       try {
-
         const response = await fetchData("user/update-address", true, "PUT", {
-          address: address
+          address: address,
         });
-        
+
         var responseUser = await fetchData("user/me", true, "GET", null);
         const newUser = {
           id: responseUser.id,
@@ -470,7 +490,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setMember(newMember);
         localStorage.setItem("user", JSON.stringify(newUser));
         localStorage.setItem("member", JSON.stringify(newMember));
-
       } catch (error) {
         console.error("Error changing user data:", error);
         reject(new Error("Failed to change user data"));
@@ -478,7 +497,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       resolve();
     });
-  }
+  };
 
   // Change password function
   const changePassword = async (
@@ -496,7 +515,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const response = await fetchData("user/update-password", true, "PUT", {
           oldPassword: currentPassword,
-          password: newPassword
+          password: newPassword,
         });
         logout();
       } catch (error) {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Download, Eye, Search } from "lucide-react";
+import { Download, Eye, Package, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,12 +24,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import type { Order } from "@/types";
-import { fetchData, getOrderSummaryById } from "@/lib/api";
+import { getOrderSummaryById } from "@/lib/api";
 import { formatRupiah } from "../../../lib/currency";
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { user, isLoading, getAccessToken } = useAuth();
+  const { user, isLoading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,22 +137,28 @@ export default function OrdersPage() {
                   All Orders
                 </TabsTrigger>
                 <TabsTrigger
-                  value="processing"
+                  value="PROSES"
                   onClick={() => setStatusFilter("PROSES")}
                 >
                   Processing
                 </TabsTrigger>
                 <TabsTrigger
-                  value="shipped"
+                  value="DIKIRIM"
                   onClick={() => setStatusFilter("DIKIRIM")}
                 >
                   On Delivery
                 </TabsTrigger>
                 <TabsTrigger
-                  value="delivered"
+                  value="SELESAI"
                   onClick={() => setStatusFilter("SELESAI")}
                 >
                   Order Completed
+                </TabsTrigger>
+                <TabsTrigger
+                  value="DIBATALKAN"
+                  onClick={() => setStatusFilter("DIBATALKAN")}
+                >
+                  Cancelled
                 </TabsTrigger>
               </TabsList>
               <div className="flex items-center gap-2">
@@ -172,10 +178,10 @@ export default function OrdersPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="PROSES">Processing</SelectItem>
+                    <SelectItem value="DIKIRIM">On Delivery</SelectItem>
+                    <SelectItem value="SELESAI">Completed</SelectItem>
+                    <SelectItem value="DIBATALKAN">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -221,10 +227,320 @@ export default function OrdersPage() {
                               View Details
                             </Button>
                           </Link>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4 mr-1" />
-                            Invoice
-                          </Button>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-2">
+                          {order.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Package />
+                                <div>
+                                  <p className="font-medium">
+                                    {item.productName}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Qty: {item.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="font-medium">
+                                {formatRupiah(item.price)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                          <p className="font-medium">Total</p>
+                          <p className="font-bold">
+                            {formatRupiah(order.total)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* The other tabs will use the same filtered content based on the status filter */}
+            <TabsContent value="PROSES" className="mt-0">
+              {filteredOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    No orders found matching your criteria.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => (
+                    <div
+                      key={order.invoiceId}
+                      className="border rounded-lg overflow-hidden"
+                    >
+                      <div className="bg-muted/50 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">
+                              Order #{order.invoiceId}
+                            </h3>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                                order.status
+                              )}`}
+                            >
+                              {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Placed on {formatDate(order.createdAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/account/orders/${order.invoiceId}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-2">
+                          {order.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Package />
+                                <div>
+                                  <p className="font-medium">
+                                    {item.productName}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Qty: {item.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="font-medium">
+                                {formatRupiah(item.price)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                          <p className="font-medium">Total</p>
+                          <p className="font-bold">
+                            {formatRupiah(order.total)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            <TabsContent value="DIKIRIM" className="mt-0">
+              {filteredOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    No orders found matching your criteria.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => (
+                    <div
+                      key={order.invoiceId}
+                      className="border rounded-lg overflow-hidden"
+                    >
+                      <div className="bg-muted/50 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">
+                              Order #{order.invoiceId}
+                            </h3>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                                order.status
+                              )}`}
+                            >
+                              {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Placed on {formatDate(order.createdAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/account/orders/${order.invoiceId}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-2">
+                          {order.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Package />
+                                <div>
+                                  <p className="font-medium">
+                                    {item.productName}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Qty: {item.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="font-medium">
+                                {formatRupiah(item.price)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                          <p className="font-medium">Total</p>
+                          <p className="font-bold">
+                            {formatRupiah(order.total)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            <TabsContent value="SELESAI" className="mt-0">
+              {filteredOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    No orders found matching your criteria.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => (
+                    <div
+                      key={order.invoiceId}
+                      className="border rounded-lg overflow-hidden"
+                    >
+                      <div className="bg-muted/50 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">
+                              Order #{order.invoiceId}
+                            </h3>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                                order.status
+                              )}`}
+                            >
+                              {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Placed on {formatDate(order.createdAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/account/orders/${order.invoiceId}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-2">
+                          {order.items.map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Package />
+                                <div>
+                                  <p className="font-medium">
+                                    {item.productName}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Qty: {item.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="font-medium">
+                                {formatRupiah(item.price)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                          <p className="font-medium">Total</p>
+                          <p className="font-bold">
+                            {formatRupiah(order.total)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            <TabsContent value="DIBATALKAN" className="mt-0">
+              {filteredOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    No orders found matching your criteria.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredOrders.map((order) => (
+                    <div
+                      key={order.invoiceId}
+                      className="border rounded-lg overflow-hidden"
+                    >
+                      <div className="bg-muted/50 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">
+                              Order #{order.invoiceId}
+                            </h3>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                                order.status
+                              )}`}
+                            >
+                              {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Placed on {formatDate(order.createdAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/account/orders/${order.invoiceId}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Button>
+                          </Link>
                         </div>
                       </div>
                       <div className="p-4">
@@ -262,17 +578,6 @@ export default function OrdersPage() {
                   ))}
                 </div>
               )}
-            </TabsContent>
-
-            {/* The other tabs will use the same filtered content based on the status filter */}
-            <TabsContent value="PROSES" className="mt-0">
-              {/* Content will be filtered by the status filter state */}
-            </TabsContent>
-            <TabsContent value="DIKIRIM" className="mt-0">
-              {/* Content will be filtered by the status filter state */}
-            </TabsContent>
-            <TabsContent value="SELESAI" className="mt-0">
-              {/* Content will be filtered by the status filter state */}
             </TabsContent>
           </Tabs>
         </CardContent>
