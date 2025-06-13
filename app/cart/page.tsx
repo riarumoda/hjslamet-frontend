@@ -144,8 +144,9 @@ export default function CartPage() {
                       <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
                         <Image
                           src={
-                            getImagePath(item.images[0], 120, 120) ||
-                            "/placeholder.svg?height=120&width=120"
+                            item.images && item.images.length > 0
+                            ? getImagePath(item.images[0], 120, 120)
+                            : "/placeholder.svg?height=120&width=120"
                           }
                           alt={item.name}
                           fill
