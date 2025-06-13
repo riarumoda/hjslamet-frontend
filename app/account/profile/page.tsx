@@ -21,15 +21,17 @@ import { useAuth } from "@/hooks/use-auth";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, member, isLoading, updateProfile, changePassword } = useAuth();
+  const { user, member, isLoading, logout, updateProfile, updateAddress, changePassword } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingAddr, setIsSavingAddr] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function ProfilePage() {
       setName(user.name || "");
       setEmail(user.email || "");
       setPhone(member?.pnumber || "");
+      setAddress(member?.address || "");
     }
   }, [user, isLoading, router]);
 
@@ -57,6 +60,22 @@ export default function ProfilePage() {
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAddressUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingAddr(true);
+
+    try {
+      await updateAddress(address);
+      toast.success("Your profile information has been updated successfully.");
+    } catch (error) {
+      toast.error(
+        "There was an error updating your profile. Please try again."
+      );
+    } finally {
+      setIsSavingAddr(false);
     }
   };
 
@@ -101,16 +120,14 @@ export default function ProfilePage() {
 
   return (
     <div className="container px-4 md:px-6 py-8">
-      <div className="flex flex-col gap-2 mb-8">
+      <div className="flex flex-col gap-2 mb-8 items-center">
         <h1 className="text-3xl font-bold tracking-tight">
-          Profile Information
+          Hi, {user.name}!
         </h1>
-        <p className="text-muted-foreground">
-          View and update your personal information
-        </p>
+        <p>Here's your account information</p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="flex grid gap-8 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
@@ -221,6 +238,47 @@ export default function ProfilePage() {
             </form>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="mt-7">
+        <Card>
+          <CardHeader>
+            <CardTitle>Shipping Address</CardTitle>
+            <CardDescription>
+              Update your shipping address
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAddressUpdate} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="ml-40 w-50" disabled={isSavingAddr}>
+                {isSavingAddr ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Changes
+                  </>
+                )}
+              </Button>
+              </form>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex justify-center mt-10">
+        <button onClick={logout} type="button" className="w-50 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Logout</button>
       </div>
     </div>
   );
