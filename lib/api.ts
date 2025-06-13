@@ -165,80 +165,6 @@ const categories: Category[] = [
   },
 ]
 
-// Mock data for members
-const membersData: Member[] = [
-  {
-    name: 'Gita Sekar Andarini',
-    pnumber: '081234567890',
-    address: 'Jl. Sakura No. 1, Jakarta',
-    email: 'gita.andarini@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Angelina Christy',
-    pnumber: '081323456789',
-    address: 'Jl. Melati No. 5, Jakarta',
-    email: 'angelina.christy@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Febriola Sinambela',
-    pnumber: '081434567890',
-    address: 'Jl. Mawar No. 3, Bandung',
-    email: 'febriola.sinambela@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Freya Jayawardana',
-    pnumber: '081545678901',
-    address: 'Jl. Anggrek No. 10, Bekasi',
-    email: 'freya.jayawardana@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Helisma Putri',
-    pnumber: '081656789012',
-    address: 'Jl. Flamboyan No. 9, Depok',
-    email: 'helisma.putri@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Jessica Chandra',
-    pnumber: '081767890123',
-    address: 'Jl. Teratai No. 4, Tangerang',
-    email: 'jessica.chandra@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Mutiara Azzahra',
-    pnumber: '081878901234',
-    address: 'Jl. Kenanga No. 6, Bogor',
-    email: 'mutiara.azzahra@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Cornelia Vanisa',
-    pnumber: '081989012345',
-    address: 'Jl. Cempaka No. 8, Jakarta',
-    email: 'cornelia.vanisa@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Fiony Alveria',
-    pnumber: '082190123456',
-    address: 'Jl. Bougenville No. 11, Bandung',
-    email: 'fiony.alveria@jkt48.com',
-    isBanned: false,
-  },
-  {
-    name: 'Lulu Salsabila',
-    pnumber: '082201234567',
-    address: 'Jl. Kamboja No. 12, Bekasi',
-    email: 'lulu.salsabila@jkt48.com',
-    isBanned: true,
-  },
-];
-
 // Helper function to get image path or fallback to placeholder
 export function getImagePath(path: string | null, width = 400, height = 400): string {
   if (!path) {
@@ -325,8 +251,12 @@ export async function getProductsByName(name: string): Promise<Product[]> {
 
 export async function getMembers(): Promise<Member[]> {
   // Simulate API call to Java backend
-  await delay(300)
-  return membersData
+  try {
+    return await fetchData("user/all-member", true);
+  } catch (error) {
+    console.error("Failed to fetch products from Java backend:", error)
+    return []
+  }
 }
 
 // Function to connect to Java backend
