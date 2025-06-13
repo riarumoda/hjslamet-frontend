@@ -80,13 +80,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const memberStr = localStorage.getItem("member");
       const adminStr = localStorage.getItem("admin");
 
-      if (!tokenStr || !userStr || !memberStr || !adminStr) {
+      const isAdminRoute = pathname.startsWith("/admin");
+
+      if (
+        !tokenStr ||
+        !userStr ||
+        (isAdminRoute && !adminStr) ||
+        (!isAdminRoute && !memberStr)
+      ) {
+        setUser(null);
+        setAdmin(null);
+        setMember(null);
         setIsLoading(false);
         return;
       }
 
-      const parsedUser = JSON.parse(userStr);
-      const parsedMember = JSON.parse(memberStr);
+
+      const parsedUser =  JSON.parse(userStr);
+      const parsedAdmin = adminStr ? JSON.parse(adminStr) : null;
+      const parsedMember = memberStr ? JSON.parse(memberStr) : null;
 
       if (parsedMember && parsedMember.banned) {
         toast.error("Your account has been banned. Please contact support.", {
@@ -136,8 +148,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       setUser(parsedUser);
-      setMember(parsedMember);
+      if (pathname.startsWith("/admin")) {
+        setAdmin(parsedAdmin)
+      } else {
+        setMember(parsedMember);
+      }
       if (!token || isTokenExpired(tokenExpiration)) {
+        console.log("masuk2");
         try {
           const response = await fetchData("auth/refresh", false, "POST", {
             refreshToken: refreshToken,
@@ -218,8 +235,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       } else {
         setUser(JSON.parse(userStr));
-        setMember(JSON.parse(memberStr));
-        setAdmin(JSON.parse(adminStr));
+        if (memberStr) {
+          setMember(JSON.parse(memberStr));
+        } else {
+          setMember(null);
+        }
+
+        if (adminStr) {
+          setAdmin(JSON.parse(adminStr));
+        } else {
+          setAdmin(null);
+        }
+
         if (member && member.banned) {
           toast.error("Your account has been banned. Please contact support.", {
             richColors: true,
@@ -412,9 +439,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.removeItem("member");
+    localStorage.removeItem("admin");
     localStorage.removeItem("cart");
 
-    router.replace("/auth/login");
+    {pathname.startsWith("/admin") ?
+      router.replace("/admin/auth")
+      :
+      router.replace("/auth/login")
+    }
     toast.success("You have been logged out successfully.", {
       richColors: true,
       position: "top-center",

@@ -43,21 +43,21 @@ const MemberTables: React.FC<MemberTablesProps> = ({ members, onDeleteMember }) 
                 <td className="px-6 py-4">{member.address}</td>
                 <td className="px-6 py-4">{member.email}</td>
                 <td className="px-6 py-4">
-                {member.banned ? (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
-                    Banned
-                    </span>
-                ) : (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
-                    Active
-                    </span>
-                )}
+                    {member.banned ? (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
+                        Banned
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
+                        Active
+                        </span>
+                    )}
                 </td>
                 <td className="px-6 py-4 flex items-center justify-center">
                     {member.banned ? (
-                        <button onClick={() => onDeleteMember(member.id!, member.banned)} type="button" className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-md text-xs px-4 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">unban</button>
+                        <button onClick={() => onDeleteMember(member.id!, member.banned)} type="button" className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-md text-xs px-4 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">unban</button>
                     ) : (
-                        <button onClick={() => onDeleteMember(member.id!, member.banned)} type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-md text-xs px-4 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Ban</button>
+                        <button onClick={() => onDeleteMember(member.id!, member.banned)} type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-md text-xs px-4 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Ban</button>
                     )}
                 </td>
                 </tr>

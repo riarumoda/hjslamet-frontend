@@ -11,36 +11,28 @@ export default function AdminConditionalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, admin, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
   const isAuthPage = pathname === "/admin/auth";
 
   useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  // Redirect ke login jika belum login
-  useEffect(() => {
-    if (hasMounted && !isLoading && !isAuthPage && !user) {
+    if (!isLoading && !isAuthPage && !user) {
       router.replace(`/admin/auth?returnUrl=${pathname}`);
     }
-  }, [hasMounted, isLoading, isAuthPage, user, pathname, router]);
+  }, [user, isLoading, isAuthPage, pathname, router]);
 
-  // Jangan render apapun sampai mount selesai (hindari SSR mismatch)
-  if (!hasMounted) return null;
-
-  // Jika masih loading atau belum login, tampilkan loader
-  if (!isAuthPage && (isLoading || (!user && !admin))) {
+  if (!isAuthPage && (isLoading)) {
     return (
       <div className="flex items-center justify-center h-screen">
         <span className="text-gray-500">Checking authentication...</span>
       </div>
     );
   }
+
+  if (!isAuthPage && !user && !isLoading) return null;
   
   if (isAuthPage) {
     return <>{children}</>;

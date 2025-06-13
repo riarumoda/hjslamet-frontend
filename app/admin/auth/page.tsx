@@ -1,5 +1,5 @@
 "use client";
-import { toast } from '@/components/ToastContainer';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
@@ -28,26 +28,23 @@ export default function AuthAdminPage() {
       const result = await loginAdmin(email, password);
 
       if (result.success) {
-        toast({
-          message: "Login successful!",
-          type: "success",
-          duration: 2000,
+        toast.success("Logged in successfully.", {
+          richColors: true,
+          position: "top-right",
         });
         const returnUrl = searchParams.get("returnUrl") || "/admin/members";
         router.push(returnUrl);
       } else {
-        toast({
-          message: result.message,
-          type: "error",
-          duration: 3000,
+        toast.error(result.message, {
+          richColors: true,
+          position: "top-right",
         });
       }
 
     } catch (error: any) {
-      toast({
-        message: error.message,
-        type: "error",
-        duration: 3000,
+      toast.error(error.message, {
+        richColors: true,
+        position: "top-right",
       });
       console.error("Caught error in handleLogin:", error);
     } finally {
