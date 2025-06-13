@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
@@ -36,8 +36,14 @@ export default function CartPage() {
   const router = useRouter();
   const close = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    if (member) {
+      setAddress(member?.address || "");
+    }
+  }, [member]);
+
   const handleCheckout = async () => {
-    if (!member) {
+    if (!member || !user) {
       toast.error("You must be logged in to checkout.", { richColors: true });
       return;
     }
@@ -111,10 +117,6 @@ export default function CartPage() {
         </Link>
       </div>
     );
-  }
-
-  if (member && member.address) {
-    setAddress(member.address);
   }
 
   return (
