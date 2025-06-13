@@ -82,11 +82,19 @@ export interface PaymentConfirmation {
 }
 
 export interface Member {
+  id?: string
   name: string;
   pnumber: string;
   email: string;
   address: string;
-  isBanned: boolean;
+  banned: boolean;
+}
+
+export interface Admin {
+  id?: string
+  name: string;
+  pnumber: string;
+  email: string;
 }
 
 export interface LoggedInUser {

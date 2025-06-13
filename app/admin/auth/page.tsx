@@ -5,10 +5,13 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { Label } from '@radix-ui/react-label';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from "next/navigation";
 import React, { FormEvent, useState } from 'react'
 
 export default function AuthAdminPage() {
+
+  const searchParams = useSearchParams();
+
   const router = useRouter()
   const { loginAdmin } = useAuth();
 
@@ -30,7 +33,8 @@ export default function AuthAdminPage() {
           type: "success",
           duration: 2000,
         });
-        router.push("/admin");
+        const returnUrl = searchParams.get("returnUrl") || "/admin/members";
+        router.push(returnUrl);
       } else {
         toast({
           message: result.message,
