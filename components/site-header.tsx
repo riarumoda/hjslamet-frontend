@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, Moon, Search, ShoppingCart, Sun, User, X } from "lucide-react";
+import { History, Menu, Moon, Search, ShoppingCart, Sun, User, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,34 +82,17 @@ export default function SiteHeader() {
           </Link>
         </nav>
         <div className="flex items-center gap-2 ml-auto">
-          {isSearchOpen ? (
-            <div className="relative flex items-center">
-              <Input
-                type="text"
-                placeholder="Search..."
-                className="w-[200px] sm:w-[300px]"
-                autoFocus
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-0"
-                onClick={() => setIsSearchOpen(false)}
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close search</span>
+          
+          {user ? (
+            <div className="relative group">
+              <Link href="/account/orders">
+              <Button variant="ghost" size="icon">
+                <History className="h-5 w-5"/>
+                <span className="sr-only">Orders</span>
               </Button>
+              </Link>
             </div>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchOpen(true)}
-            >
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Search</span>
-            </Button>
-          )}
+          ) : ""}
 
           {mounted && (
             <Button
