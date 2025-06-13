@@ -13,6 +13,7 @@ import {
   getProductsByCategory,
   getProductsByPriceRange,
   getProductsByName,
+  getLandingProducts,
 } from "@/lib/api";
 import { Product } from "@/types";
 
@@ -43,7 +44,7 @@ export default async function ProductsPage({
   } else if (min !== undefined && max !== undefined) {
     products = await getProductsByPriceRange(min, max);
   } else {
-    products = await getAllProducts();
+    products = await getLandingProducts();
   }
 
   // Always apply search filter last, on the current filtered products

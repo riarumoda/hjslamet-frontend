@@ -4,11 +4,47 @@ import ProductTables from '@/components/ui-admin/product-tables'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { Product } from "@/types";
+import { fetchData } from '@/lib/api';
 import { getAllProducts } from '@/lib/api';
+import DeleteConfirmation from '@/components/ui-admin/modal-confirmation';
+import { toast } from 'sonner';
 
 export default function ProductsPage() {
   const router = useRouter()
+  
   const [products, setProducts] = useState<Product[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  const handleDeleteClick = (productId: string,) => {
+    setSelectedProductId(productId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProductId(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (selectedProductId) {
+      try {
+        const result = await fetchData(`products/${selectedProductId}`, true, "DELETE")
+        toast.promise(result, {
+            position:"top-right",
+            loading: 'Loading...',
+            success: "Delete product successfully.",
+            error: 'Something went wrong!',
+        });  
+        getAllProducts().then(setProducts)
+      } catch (error) {
+        toast.error("Something went wrong!", {
+          position: "top-right",
+        });
+      }
+      closeModal();
+    }
+  };
 
   useEffect(() => {
     getAllProducts().then(setProducts)
@@ -44,15 +80,18 @@ export default function ProductsPage() {
             {/* card table */}
             <div className='mt-6'>
               <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                  <ProductTables products={products}/>
+                  <ProductTables products={products} onDeleteProduct={handleDeleteClick}/>
               </div>
             </div>
-
-            {/* pagination */}
-            {/* <div className='mt-4'>
-              <PaginationAdmin/>
-            </div> */}
         </div>
+
+        {isModalOpen && (
+        <DeleteConfirmation
+          onDeleteConfirm={handleDeleteConfirm}
+          onClose={closeModal}
+          type={"product"}
+        />
+      )}
     </div>
   )
 }

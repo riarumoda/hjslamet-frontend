@@ -2,7 +2,6 @@
 
 import MemberTables from '@/components/ui-admin/member-tables'
 import DeleteConfirmation from '@/components/ui-admin/modal-confirmation';
-import { useAuth } from '@/hooks/use-auth';
 import { getMembers } from '@/lib/api';
 import { Member } from '@/types';
 import React, { useEffect, useState } from 'react'

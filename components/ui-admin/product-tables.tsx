@@ -4,10 +4,11 @@ import React from 'react'
 import { Product } from "@/types";
 
 interface ProductTablesProps {
-  products: Product[];
+    products: Product[];
+    onDeleteProduct: (productId: string,) => void;
 }
 
-const ProductTables: React.FC<ProductTablesProps> = ({ products }) => {
+const ProductTables: React.FC<ProductTablesProps> = ({ products, onDeleteProduct }) => {
     return (
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -43,7 +44,7 @@ const ProductTables: React.FC<ProductTablesProps> = ({ products }) => {
                     <td className="px-6 py-4">{product.stock}</td>
                     <td className="px-6 py-4">
                         <Link href={`./products/edit/${product.id}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
-                        <a href="#" className="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
+                        <button onClick={() => onDeleteProduct(product.id)} className="cursor-pointer font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</button>
                     </td>
                     </tr>
             ))}
