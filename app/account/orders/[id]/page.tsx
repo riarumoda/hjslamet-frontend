@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Download, Truck } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
+import jsPDF from "jspdf";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import type { Order } from "@/types";
-import { fetchData, getOrderSummaryById } from "@/lib/api";
+import { getOrderSummaryById } from "@/lib/api";
+import { formatRupiah } from "@/lib/currency";
 
 export default function OrderDetailsPage({
   params,
@@ -24,7 +26,7 @@ export default function OrderDetailsPage({
   params: { id: string };
 }) {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, member } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoadingOrder, setIsLoadingOrder] = useState(true);
 
@@ -55,6 +57,48 @@ export default function OrderDetailsPage({
       fetchOrder();
     }
   }, [user, params.id]);
+
+  const handleDownloadInvoice = () => {
+    if (!order) return;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(24);
+    doc.text("------------ H.SLAMET SHOP ------------", 14, 10);
+
+    doc.setFontSize(18);
+    doc.text(`INVOICE #${order.invoiceId}`, 14, 18);
+
+    doc.setFontSize(12);
+    doc.text(`Date: ${formatDate(order.createdAt)}`, 14, 28);
+    doc.text(`Status: ${order.status}`, 14, 36);
+
+    doc.text(`Customer: ${member?.name || ""}`, 14, 46);
+    doc.text(`Address: ${member?.address || ""}`, 14, 54);
+    doc.text(`Phone: ${member?.pnumber || ""}`, 14, 62);
+
+    doc.setFontSize(14);
+    doc.text("Items:", 14, 74);
+
+    let y = 82;
+    order.items.forEach((item, idx) => {
+      doc.setFontSize(12);
+      doc.text(
+        `${idx + 1}. ${item.productName} x${item.quantity} @ ${formatRupiah(
+          item.price
+        )} = ${formatRupiah(item.price * item.quantity)}`,
+        16,
+        y
+      );
+      y += 8;
+    });
+
+    y += 8;
+    doc.setFontSize(14);
+    doc.text(`Total: ${formatRupiah(order.total)}`, 14, y);
+
+    doc.save(`invoice-${order.invoiceId}.pdf`);
+  };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -118,7 +162,7 @@ export default function OrderDetailsPage({
           <h1 className="text-3xl font-bold tracking-tight">
             Order #{order.invoiceId}
           </h1>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleDownloadInvoice}>
             <Download className="h-4 w-4 mr-2" />
             Download Invoice
           </Button>
@@ -152,7 +196,6 @@ export default function OrderDetailsPage({
                     className="flex justify-between items-center"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-muted rounded"></div>
                       <div>
                         <p className="font-medium">{item.productName}</p>
                         <p className="text-sm text-muted-foreground">
@@ -160,90 +203,14 @@ export default function OrderDetailsPage({
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">${item.price.toFixed(2)}</p>
+                    <div className="text-right pl-5">
+                      <p className="font-medium">{formatRupiah(item.price)}</p>
                       <p className="text-sm text-muted-foreground">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        Subtotal: {formatRupiah(item.price * item.quantity)}
                       </p>
                     </div>
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Order Timeline</CardTitle>
-              <CardDescription>Track the status of your order</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative border-l pl-6 pb-6">
-                <div className="absolute left-0 top-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center -translate-x-1/2">
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                </div>
-                <div className="mb-8">
-                  <h3 className="font-medium">Order Placed</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(order.createdAt)}
-                  </p>
-                  <p className="mt-2">
-                    Your order has been placed successfully.
-                  </p>
-                </div>
-
-                <div className="absolute left-0 top-24 w-6 h-6 rounded-full bg-primary flex items-center justify-center -translate-x-1/2">
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                </div>
-                <div className="mb-8">
-                  <h3 className="font-medium">Payment Confirmed</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(
-                      new Date(
-                        new Date(order.createdAt).getTime() + 1000 * 60 * 30
-                      ).toISOString()
-                    )}
-                  </p>
-                  <p className="mt-2">Your payment has been confirmed.</p>
-                </div>
-
-                <div className="absolute left-0 top-48 w-6 h-6 rounded-full bg-primary flex items-center justify-center -translate-x-1/2">
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                </div>
-                <div className="mb-8">
-                  <h3 className="font-medium">Order Shipped</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(
-                      new Date(
-                        new Date(order.createdAt).getTime() +
-                          1000 * 60 * 60 * 24
-                      ).toISOString()
-                    )}
-                  </p>
-                  <p className="mt-2">
-                    Your order has been shipped via Express Delivery.
-                  </p>
-                  <div className="mt-2 p-3 bg-muted rounded-md flex items-center gap-3">
-                    <Truck className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Tracking Number</p>
-                      <p className="text-sm">TRK123456789</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="absolute left-0 top-96 w-6 h-6 rounded-full bg-primary flex items-center justify-center -translate-x-1/2">
-                  <div className="w-2 h-2 rounded-full bg-white"></div>
-                </div>
-                <div>
-                  <h3 className="font-medium">Order Delivered</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(order.updatedAt)}
-                  </p>
-                  <p className="mt-2">
-                    Your order has been delivered successfully.
-                  </p>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -256,22 +223,10 @@ export default function OrderDetailsPage({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>${(order.total - 10).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>$10.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span>Included</span>
-                </div>
                 <Separator />
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
-                  <span>${order.total.toFixed(2)}</span>
+                  <span>{formatRupiah(order.total)}</span>
                 </div>
               </div>
             </CardContent>
@@ -279,40 +234,13 @@ export default function OrderDetailsPage({
 
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Shipping Information</CardTitle>
+              <CardTitle>Customer Information</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="font-medium">John Doe</p>
-                <p className="text-muted-foreground">123 Main Street</p>
-                <p className="text-muted-foreground">Apt 4B</p>
-                <p className="text-muted-foreground">New York, NY 10001</p>
-                <p className="text-muted-foreground">United States</p>
-                <p className="text-muted-foreground">+1 (555) 123-4567</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Payment Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Payment Method</span>
-                  <span>Credit Card</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Card</span>
-                  <span>•••• 4242</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status</span>
-                  <span className="text-green-600 dark:text-green-400">
-                    Paid
-                  </span>
-                </div>
+                <p className="font-medium">{member?.name || ""}</p>
+                <p className="text-muted-foreground">{member?.address || ""}</p>
+                <p className="text-muted-foreground">{member?.pnumber || ""}</p>
               </div>
             </CardContent>
           </Card>

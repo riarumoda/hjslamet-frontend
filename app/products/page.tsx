@@ -2,16 +2,17 @@ import { Suspense } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ProductCard from "@/components/product-card";
 import ProductFilters from "@/components/product-filters";
 import ProductsLoading from "@/components/products-loading";
+import ProductSearchInput from "@/app/products/searchinput";
 import {
   getAllProducts,
   getProductsByCategory,
   getProductsByPriceRange,
+  getProductsByName,
 } from "@/lib/api";
 import { Product } from "@/types";
 
@@ -23,6 +24,7 @@ export default async function ProductsPage({
   searchParams,
 }: ProductsPageProps) {
   let products: Product[] = [];
+  let tempProducts: Product[] = [];
   const category =
     typeof searchParams.category === "string"
       ? searchParams.category
@@ -31,6 +33,7 @@ export default async function ProductsPage({
     typeof searchParams.min === "string" ? Number(searchParams.min) : undefined;
   const max =
     typeof searchParams.max === "string" ? Number(searchParams.max) : undefined;
+  const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
 
   if (category && min !== undefined && max !== undefined) {
     // Filter by category and price range
@@ -42,6 +45,14 @@ export default async function ProductsPage({
     products = await getProductsByPriceRange(min, max);
   } else {
     products = await getAllProducts();
+    tempProducts = products;
+  }
+
+  if (q) {
+    const searchQuery = q.toLowerCase();
+    products = tempProducts.filter((product) =>
+      product.name.toLowerCase().includes(searchQuery)
+    );
   }
 
   return (
@@ -56,10 +67,7 @@ export default async function ProductsPage({
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Input
-                placeholder="Search products..."
-                className="md:w-[200px] lg:w-[300px]"
-              />
+              <ProductSearchInput />
             </div>
             <Sheet>
               <SheetTrigger asChild>
