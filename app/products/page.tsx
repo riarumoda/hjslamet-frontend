@@ -24,7 +24,6 @@ export default async function ProductsPage({
   searchParams,
 }: ProductsPageProps) {
   let products: Product[] = [];
-  let tempProducts: Product[] = [];
   const category =
     typeof searchParams.category === "string"
       ? searchParams.category
@@ -45,12 +44,12 @@ export default async function ProductsPage({
     products = await getProductsByPriceRange(min, max);
   } else {
     products = await getAllProducts();
-    tempProducts = products;
   }
 
+  // Always apply search filter last, on the current filtered products
   if (q) {
     const searchQuery = q.toLowerCase();
-    products = tempProducts.filter((product) =>
+    products = products.filter((product) =>
       product.name.toLowerCase().includes(searchQuery)
     );
   }
