@@ -368,13 +368,6 @@ export async function fetchAuthRegisterFromJavaBackend() {
   }
 }
 
-export const dummyUser: LoggedInUser = {
-  userId: "user123",
-  name: "Aliya Raya",
-  pnumber: "081121234321",
-  email: "raliya04@rarea.com",
-};
-
 export async function createOrder(checkoutData: CheckoutRequest) {
   try {
     return await fetchData("transaction/checkout", true, "POST", checkoutData)
