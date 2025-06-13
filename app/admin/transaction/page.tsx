@@ -5,6 +5,7 @@ import TransactionTables from '@/components/ui-admin/transaction-tables'
 import { fetchData } from '@/lib/api'
 import { Trx } from '@/types'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner';
 
 export default function TransactionPage() {
   const [originalTransactions, setOriginalTransactions] = useState<Trx[]>([]);
@@ -40,11 +41,20 @@ export default function TransactionPage() {
     setTransactions(filtered);
   };
 
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      console.log(newStatus);
+      
+      const isCancel = (newStatus === "DIBATALKAN")
+      await fetchData(`transaction/status/${selectedTransaction?.invoiceId}/${isCancel}`, true, "PUT");
+      toast.success("Status updated successfully.", {position:"top-right"});
+      handleGetData();
+      closeModal();
+    } catch (error) {
+      toast.error("Failed to update the status. Please try again.", {position:"top-right"});
+    }
 
-  const handleStatusChange = async (newStatus: Trx["status"]) => {
-
-  }
-
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -102,7 +112,7 @@ export default function TransactionPage() {
         trx={selectedTransaction!}
         isOpen={isModalOpen}
         onClose={closeModal}  
-        onStatusChange={() => {}}
+        onStatusChange={handleStatusChange}
       />
     </div>
   )

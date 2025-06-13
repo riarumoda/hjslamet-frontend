@@ -53,23 +53,7 @@ export default function TransactionModal({
                 <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                     <p><strong>Date:</strong> {new Date(trx.trxDate).toLocaleString()}</p>
                     <p className="flex items-center gap-2">
-                    <strong>Status:</strong>
-                    <select
-                        value={editedStatus ?? ""}
-                        onChange={(e) =>
-                        setEditedStatus(
-                            e.target.value as "PROSES" | "DIKIRIM" | "SELESAI" | "DIBATALKAN"
-                        )
-                        }
-                        className="border rounded px-2 py-1 text-sm dark:bg-gray-800 dark:text-white dark:border-gray-600 print:hidden"
-                    >
-                        {statusOptions.map((status) => (
-                        <option key={status} value={status}>
-                            {statusLabelMap[status]}
-                        </option>
-                        ))}
-                    </select>
-                    <span className="hidden print:inline">{statusLabelMap[trx.status]}</span>
+                        <strong>Status:</strong> <span>{statusLabelMap[trx.status]}</span>
                     </p>
                 </div>
 
@@ -121,32 +105,43 @@ export default function TransactionModal({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-between items-center pt-4 print:hidden">
-                    {/* Left: Save status if changed */}
-                    <div>
-                        {editedStatus !== trx.status && (
+                <div className="flex flex-wrap justify-between items-center gap-x-6 gap-y-3 pt-4 print:hidden">
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-3">
+                        {trx.status === "PROSES" && (
+                        <>
+                            <button
+                            onClick={() => onStatusChange("DIKIRIM")}
+                            className="min-w-[160px] px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                            Mark as Shipped
+                            </button>
+                            <button
+                            onClick={() => onStatusChange("DIBATALKAN")}
+                            className="min-w-[160px] px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                            >
+                            Cancel Transaction
+                            </button>
+                        </>
+                        )}
+
+                        {trx.status === "DIKIRIM" && (
                         <button
-                            onClick={() => onStatusChange(editedStatus)}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 mr-2"
+                            onClick={() => onStatusChange("SELESAI")}
+                            className="min-w-[160px] px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
                         >
-                            Save Status
+                            Mark as Completed
                         </button>
                         )}
                     </div>
 
-                    {/* Right: Print & Close */}
-                    <div className="flex gap-2">
+                    {/* Download Button */}
+                    <div>
                         <button
-                            onClick={() => window.print()}
-                              className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 print:hidden"
+                        onClick={() => window.print()}
+                        className="min-w-[160px] px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
                         >
                         Download Invoice
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded dark:text-gray-300 dark:hover:text-gray-700 hover:bg-gray-100"
-                        >
-                        Close
                         </button>
                     </div>
                 </div>
