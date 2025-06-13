@@ -2,9 +2,10 @@
 
 import MemberTables from '@/components/ui-admin/member-tables'
 import DeleteConfirmation from '@/components/ui-admin/modal-confirmation';
-import { getMembers } from '@/lib/api';
+import { fetchData, getMembers } from '@/lib/api';
 import { Member } from '@/types';
 import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner';
 
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([])
@@ -13,7 +14,7 @@ export default function MembersPage() {
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
   // Open modal and set selected member ID
-  const handleDeleteClick = (memberId: string, isBanned: boolean) => {
+  const handleBanClick = (memberId: string, isBanned: boolean) => {
     setSelectedMemberStatus(isBanned)
     setSelectedMemberId(memberId);
     setIsModalOpen(true);
@@ -26,11 +27,22 @@ export default function MembersPage() {
   };
 
   // Confirm delete action
-  const handleDeleteConfirm = () => {
+  const handleBanConfirm = async () => {
     if (selectedMemberId) {
-      // Your delete logic here, e.g., API call or state update
-      console.log(`Deleting member with ID: ${selectedMemberId}`);
-      // After deletion, close modal
+      let result;
+      if (selectedMemberStatus == true) {
+        result = await fetchData(`user/unban/${selectedMemberId}`, true, "PUT")
+      } else {
+        result = await fetchData(`user/ban/${selectedMemberId}`, true, "PUT")
+      }
+      toast.promise(result, {
+        position:"top-right",
+        loading: 'Loading...',
+        success: "Banned or unbanned member successfully.",
+        error: 'Something went wrong!',
+      });  
+      getMembers().then(setMembers)
+      // console.log(`Deleting member with ID: ${selectedMemberId}`);
       closeModal();
     }
   };
@@ -66,14 +78,14 @@ export default function MembersPage() {
           {/* card table */}
           <div className='mt-6'>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <MemberTables members={members} onDeleteMember={handleDeleteClick}/>
+                <MemberTables members={members} onDeleteMember={handleBanClick}/>
             </div>
           </div>
       </div>
 
       {isModalOpen && (
         <DeleteConfirmation
-          onDeleteConfirm={handleDeleteConfirm}
+          onDeleteConfirm={handleBanConfirm}
           onClose={closeModal}
           type={"member"}
           status={selectedMemberStatus}
