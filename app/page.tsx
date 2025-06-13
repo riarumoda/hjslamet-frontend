@@ -13,18 +13,19 @@ export default async function Home() {
       {/* Hero Section */}
       <section
       className="bg-cover bg-no-repeat w-full py-12 md:py-24 lg:py-32 bg-muted flex flex-col items-center justify-center"
-      style={{ backgroundImage: "url('assets/shop.jpg')" }}
+      // style={{ backgroundImage: "url('assets/shop.jpg')" }}
       >
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                  Quality Products by H. Slamet
+                  Welcome to H. Slamet’s<br />
+                  Where Essentials Meet Great Deals
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  Shop our curated collection of premium products. Quality you
-                  can trust, prices you'll love.
+                  From rice to toothpaste 
+                  everything your home needs, in one place.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -45,11 +46,11 @@ export default async function Home() {
               <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex items-center justify-center">
                 <img
                   className="relative rounded-lg h-full w-full object-cover text-gray-400"
-                  src="assets/shop.jpg"
+                  src="assets/GambarPromo.png"
                 />
-                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-background px-4 py-2 rounded-full shadow-lg">
+                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-background px-4 py-2 rounded-full shadow-lg bg-red-500 text-white">
                   <p className="font-medium text-center">
-                    New Collection Available
+                    Crazy Deals! Limited Time Only
                   </p>
                 </div>
               </div>

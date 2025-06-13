@@ -121,6 +121,104 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
+
+        <div className="py-8">
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
+              <p className="text-muted-foreground mb-2">
+                <strong>Effective Date:</strong> June 13, 2025
+              </p>
+              <p className="text-muted-foreground mb-4">
+                H. Slamet we values your privacy. This Privacy Policy explains how we collect, use,
+                and protect your information when you visit our website and use our services.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">1. Information We Collect</h2>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                <li><strong>Personal Information:</strong> Name, email, phone number, address, billing info.</li>
+                <li><strong>Usage Data:</strong> IP address, browser info, and site interaction logs.</li>
+                <li><strong>Cookies:</strong> Used for functionality and analytics.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">2. How We Use Your Information</h2>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                <li>To fulfill orders and deliver products</li>
+                <li>To send updates and promotions</li>
+                <li>To improve site experience</li>
+                <li>To ensure security and prevent fraud</li>
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">3. Data Security</h2>
+              <p className="text-muted-foreground">
+                We take reasonable measures to protect your information from unauthorized access, disclosure, or destruction.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">4. Contact Us</h2>
+              <p className="text-muted-foreground">
+                For questions, contact us at <a className="underline" href="mailto:info@hslamet.com">info@hslamet.com</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="py-8">
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Terms of Service</h2>
+              <p className="text-muted-foreground mb-2">
+                <strong>Effective Date:</strong> June 13, 2025
+              </p>
+              <p className="text-muted-foreground mb-4">
+                By using our website and services, you agree to the following terms and conditions.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">1. User Responsibilities</h2>
+              <p className="text-muted-foreground">
+                You agree to provide accurate information and not misuse our services.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">2. Orders and Payment</h2>
+              <p className="text-muted-foreground">
+                All transactions are subject to availability and confirmation. Prices may change without prior notice.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">3. Shipping and Returns</h2>
+              <p className="text-muted-foreground">
+                Items can be returned within 7 days if unused and in original packaging.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">4. Limitation of Liability</h2>
+              <p className="text-muted-foreground">
+                We are not responsible for indirect damages resulting from use of our services.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">5. Contact Us</h2>
+              <p className="text-muted-foreground">
+                For any inquiries, please contact us at <a className="underline" href="mailto:info@hslamet.com">info@hslamet.com</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   )
