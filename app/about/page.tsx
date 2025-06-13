@@ -14,7 +14,7 @@ export default function AboutPage() {
           <p className="text-muted-foreground">Learn about our story and mission</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid gap-12">
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-4">Our Story</h2>
@@ -39,64 +39,6 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Us</CardTitle>
-                <CardDescription>
-                  We'd love to hear from you. Send us a message or use our contact information below.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">
-                        Name
-                      </label>
-                      <Input id="name" placeholder="Your name" />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">
-                        Email
-                      </label>
-                      <Input id="email" type="email" placeholder="Your email" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-medium">
-                      Subject
-                    </label>
-                    <Input id="subject" placeholder="Subject" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium">
-                      Message
-                    </label>
-                    <Textarea id="message" placeholder="Your message" rows={4} />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    Send Message
-                  </Button>
-                </form>
-
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-muted-foreground" />
-                    <span>123 Main Street, City, Country</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-muted-foreground" />
-                    <span>+1 (555) 123-4567</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
-                    <span>info@hslamet.com</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         <div className="mt-12">
