@@ -318,7 +318,7 @@ export async function fetchData(endpoint: string,  needToken: boolean, method = 
 export async function fetchProductsFromJavaBackend() {
   try {
     // This would be replaced with an actual call to your Java backend
-    return await fetchData("products", false)
+    return await fetchData("products/admin", true)
   } catch (error) {
     console.error("Failed to fetch products from Java backend:", error)
     // Fallback to mock data if Java backend is not available
