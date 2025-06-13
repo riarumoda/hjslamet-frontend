@@ -1,8 +1,8 @@
 "use client";
 
 import { fetchData } from "@/lib/api";
-import { Member, RegisterRequest, Token } from "@/types";
-import { useParams, useRouter } from "next/navigation";
+import { Admin, Member, RegisterRequest, Token } from "@/types";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import type React from "react";
 
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  admin: Admin | null;
   member: Member | null; // Assuming Member is a type that extends User
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -43,6 +44,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  admin: null,
   member: null, // Assuming Member is a type that extends User
   isLoading: true,
   login: async () => {},
@@ -63,26 +65,42 @@ const isTokenExpired = (expiration: number): boolean => {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [admin, setAdmin] = useState<Admin | null>(null);
   const [member, setMember] = useState<Member | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const param = useParams();
 
+  const pathname = usePathname();
   const router = useRouter();
+
   useEffect(() => {
     const checkAuth = async () => {
       const tokenStr = localStorage.getItem("token");
       const userStr = localStorage.getItem("user");
       const memberStr = localStorage.getItem("member");
+      const adminStr = localStorage.getItem("admin");
 
-      if (!tokenStr || !userStr || !memberStr) {
+      const isAdminRoute = pathname.startsWith("/admin");
+
+      if (
+        !tokenStr ||
+        !userStr ||
+        (isAdminRoute && !adminStr) ||
+        (!isAdminRoute && !memberStr)
+      ) {
+        setUser(null);
+        setAdmin(null);
+        setMember(null);
         setIsLoading(false);
         return;
       }
 
-      const parsedUser = JSON.parse(userStr);
-      const parsedMember = JSON.parse(memberStr);
 
-      if (parsedMember && parsedMember.isBanned) {
+      const parsedUser =  JSON.parse(userStr);
+      const parsedAdmin = adminStr ? JSON.parse(adminStr) : null;
+      const parsedMember = memberStr ? JSON.parse(memberStr) : null;
+
+      if (parsedMember && parsedMember.banned) {
         toast.error("Your account has been banned. Please contact support.", {
           richColors: true,
         });
@@ -130,7 +148,120 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       setUser(parsedUser);
-      setMember(parsedMember);
+      if (pathname.startsWith("/admin")) {
+        setAdmin(parsedAdmin)
+      } else {
+        setMember(parsedMember);
+      }
+      if (!token || isTokenExpired(tokenExpiration)) {
+        console.log("masuk2");
+        try {
+          const response = await fetchData("auth/refresh", false, "POST", {
+            refreshToken: refreshToken,
+          });
+          if (response) {
+            const newToken: Token = {
+              token: response.token,
+              refreshToken: response.refreshToken,
+              tokenExpiration: response.expiration,
+            };
+            localStorage.setItem("token", JSON.stringify(newToken));
+            const responseUser = await fetchData("user/me", true, "GET", null);
+            const newUser: User = {
+              id: responseUser.id,
+              name: responseUser.name,
+              email: responseUser.email,
+            };
+
+            if (pathname.startsWith("/admin")){
+              const newAdmin: Admin = {
+                name: responseUser.name,
+                email: responseUser.email,
+                pnumber: responseUser.phoneNumber || ""
+              };
+              setUser(newUser);
+              setAdmin(newAdmin);
+              localStorage.setItem("user", JSON.stringify(newUser));
+              localStorage.setItem("admin", JSON.stringify(newAdmin));
+            } else {
+              const newMember: Member = {
+                name: responseUser.name,
+                email: responseUser.email,
+                pnumber: responseUser.phoneNumber || "",
+                address: responseUser.address || "",
+                banned: responseUser.banned || false,
+              };
+              setMember(newMember);
+              setUser(newUser);
+              if (member && member.banned) {
+                toast.error(
+                  "Your account has been banned. Please contact support.",
+                  {
+                    richColors: true,
+                  }
+                );
+                setUser(null);
+                setMember(null);
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                localStorage.removeItem("member");
+                router.replace("/account/banned");
+                setIsLoading(false);
+                return;
+              }
+              localStorage.setItem("user", JSON.stringify(newUser));
+              localStorage.setItem("member", JSON.stringify(newMember));
+            }
+            param.returnUrl && router.replace(param.returnUrl.toString());
+          }
+        } catch (e) {
+          toast.error("Your session has expired. Please log in again.", {
+            richColors: true,
+          });
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          localStorage.removeItem("member");
+          localStorage.removeItem("admin");
+
+          {pathname.startsWith("/admin") ?
+            router.replace("/admin/auth")
+            :
+            router.replace("/auth/login")
+          }
+          setIsLoading(false);
+          return;
+        }
+        setIsLoading(false);
+        return;
+      } else {
+        setUser(JSON.parse(userStr));
+        if (memberStr) {
+          setMember(JSON.parse(memberStr));
+        } else {
+          setMember(null);
+        }
+
+        if (adminStr) {
+          setAdmin(JSON.parse(adminStr));
+        } else {
+          setAdmin(null);
+        }
+
+        if (member && member.banned) {
+          toast.error("Your account has been banned. Please contact support.", {
+            richColors: true,
+          });
+          setUser(null);
+          setMember(null);
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          localStorage.removeItem("member");
+          router.replace("/account/banned");
+          setIsLoading(false);
+          return;
+        }
+      }
+
       setIsLoading(false);
     };
     checkAuth();
@@ -166,7 +297,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: responseUser.email,
             pnumber: responseUser.phoneNumber || "",
             address: responseUser.address || "",
-            isBanned: responseUser.isBanned || false,
+            banned: responseUser.banned || false,
           };
           setMember(newMember);
           localStorage.setItem("user", JSON.stringify(newUser));
@@ -258,19 +389,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Mengambil data user setelah login berhasil
-      const responseUser = await fetchData("user/me-admin", true, "GET", null);
-
-      const newUser = {
-        id: responseUser.id,
-        name: responseUser.name,
-        email: responseUser.email,
-      };
-
-      // Simpan user ke state dan localStorage
-      setUser(newUser); // Pastikan setUser berasal dari context/state management
-      localStorage.setItem("user", JSON.stringify(newUser));
-
       // Simpan token dan informasi kadaluarsa ke localStorage
       const tokenWithMeta: Token = {
         token: response.token,
@@ -279,6 +397,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       localStorage.setItem("token", JSON.stringify(tokenWithMeta));
+
+      // Mengambil data user setelah login berhasil
+      const responseUser = await fetchData("user/me-admin", true, "GET", null);
+
+      const newUser = {
+        id: responseUser.id,
+        name: responseUser.name,
+        email: responseUser.email,
+      };
+      setUser(newUser);
+      const newAdmin: Admin = {
+        name: responseUser.name,
+        email: responseUser.email,
+        pnumber: responseUser.phoneNumber || ""
+      };
+      setAdmin(newAdmin);
+      localStorage.setItem("user", JSON.stringify(newUser));
+      localStorage.setItem("admin", JSON.stringify(newAdmin));
 
       return { success: true, message: "Login successful." };
     } catch (error) {
@@ -303,9 +439,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.removeItem("member");
+    localStorage.removeItem("admin");
     localStorage.removeItem("cart");
 
-    router.replace("/auth/login");
+    {pathname.startsWith("/admin") ?
+      router.replace("/admin/auth")
+      :
+      router.replace("/auth/login")
+    }
     toast.success("You have been logged out successfully.", {
       richColors: true,
       position: "top-center",
@@ -343,7 +484,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: responseUser.email,
           pnumber: responseUser.phoneNumber || "",
           address: responseUser.address || "",
-          isBanned: responseUser.isBanned || false,
+          banned: responseUser.banned || false,
         };
         setMember(newMember);
         localStorage.setItem("user", JSON.stringify(newUser));
@@ -376,7 +517,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: responseUser.email,
           pnumber: responseUser.phoneNumber || "",
           address: responseUser.address || "",
-          isBanned: responseUser.isBanned || false,
+          banned: responseUser.banned || false,
         };
         setMember(newMember);
         localStorage.setItem("user", JSON.stringify(newUser));
@@ -467,6 +608,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        admin,
         member, // Assuming Member extends User
         isLoading,
         login,

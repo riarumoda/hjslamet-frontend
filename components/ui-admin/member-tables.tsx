@@ -1,18 +1,12 @@
+import { Member } from '@/types';
 import React from 'react'
-
-export interface Member {
-  name: string;
-  pnumber: string;
-  address: string;
-  email: string;
-  isBanned: boolean;
-}
 
 interface MemberTablesProps {
   members: Member[];
+  onDeleteMember: (memberId: string, banned: boolean) => void;
 }
 
-const MemberTables: React.FC<MemberTablesProps> = ({ members }) => {
+const MemberTables: React.FC<MemberTablesProps> = ({ members, onDeleteMember }) => {
     return (
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -22,7 +16,7 @@ const MemberTables: React.FC<MemberTablesProps> = ({ members }) => {
                 <th scope="col" className="px-6 py-3">Address</th>
                 <th scope="col" className="px-6 py-3">Email</th>
                 <th scope="col" className="px-6 py-3">Banned</th>
-                <th scope="col" className="px-6 py-3">Action</th>
+                <th scope="col" className="px-6 py-3 flex justify-center">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -49,19 +43,22 @@ const MemberTables: React.FC<MemberTablesProps> = ({ members }) => {
                 <td className="px-6 py-4">{member.address}</td>
                 <td className="px-6 py-4">{member.email}</td>
                 <td className="px-6 py-4">
-                {member.isBanned ? (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
-                    Banned
-                    </span>
-                ) : (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
-                    Active
-                    </span>
-                )}
+                    {member.banned ? (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
+                        Banned
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
+                        Active
+                        </span>
+                    )}
                 </td>
-                <td className="flex items-center px-6 py-4">
-                    <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                    <a href="#" className="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
+                <td className="px-6 py-4 flex items-center justify-center">
+                    {member.banned ? (
+                        <button onClick={() => onDeleteMember(member.id!, member.banned)} type="button" className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-md text-xs px-4 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">unban</button>
+                    ) : (
+                        <button onClick={() => onDeleteMember(member.id!, member.banned)} type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-md text-xs px-4 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Ban</button>
+                    )}
                 </td>
                 </tr>
             ))}
