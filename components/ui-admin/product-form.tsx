@@ -15,7 +15,7 @@ export default function ProductForm({ initialValues, onSubmit, mode = 'create' }
     const [name, setName] = useState(initialValues?.name || '');
     const [category, setCategory] = useState(initialValues?.category || '');
     const [price, setPrice] = useState(
-        initialValues?.oldPrice != null ? initialValues.oldPrice.toString() : ''
+        initialValues?.oldPrice != null ? initialValues.oldPrice.toString() : initialValues?.price.toString()
     );
     const [stock, setStock] = useState(initialValues?.stock.toString() || '');
     const [discount, setDiscount] = useState(initialValues?.discount || '');
