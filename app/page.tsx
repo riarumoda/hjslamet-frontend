@@ -12,7 +12,7 @@ export default async function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen">
       {/* Hero Section */}
       <section
-      className="bg-cover bg-no-repeat w-full py-12 md:py-24 lg:py-32 bg-muted flex flex-col items-center justify-center"
+      className="bg-cover bg-no-repeat w-full py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center"
       // style={{ backgroundImage: "url('assets/shop.jpg')" }}
       >
         <div className="container px-4 md:px-6">
