@@ -81,6 +81,7 @@ export default function CartPage() {
     try {
       await createOrder(checkoutRequest);
       clearCart();
+      localStorage.removeItem("cart");
       toast.success("Checkout successful! ", {
         richColors: true,
         description: "Your order has been placed.",
@@ -145,8 +146,8 @@ export default function CartPage() {
                         <Image
                           src={
                             item.images && item.images.length > 0
-                            ? getImagePath(item.images[0], 120, 120)
-                            : "/placeholder.svg?height=120&width=120"
+                              ? getImagePath(item.images[0], 120, 120)
+                              : "/placeholder.svg?height=120&width=120"
                           }
                           alt={item.name}
                           fill
