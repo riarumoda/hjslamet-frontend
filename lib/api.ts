@@ -213,7 +213,7 @@ export async function getProductById(id: string): Promise<Product | undefined> {
 }
 
 export async function getRelatedProducts(id: string): Promise<Product[]> {
-  const allProducts = await getAllProducts()
+  const allProducts = await getLandingProducts()
   const product = allProducts.find((p) => p.id === id)
   if (!product) return []
 

@@ -8,6 +8,7 @@ import type React from "react";
 import { toast } from "sonner";
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useCart } from "./use-cart";
 
 interface User {
   id: string;
@@ -69,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [member, setMember] = useState<Member | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const param = useParams();
+  const { clearCart } = useCart();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -95,8 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-
-      const parsedUser =  JSON.parse(userStr);
+      const parsedUser = JSON.parse(userStr);
       const parsedAdmin = adminStr ? JSON.parse(adminStr) : null;
       const parsedMember = memberStr ? JSON.parse(memberStr) : null;
 
@@ -149,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setUser(parsedUser);
       if (pathname.startsWith("/admin")) {
-        setAdmin(parsedAdmin)
+        setAdmin(parsedAdmin);
       } else {
         setMember(parsedMember);
       }
@@ -173,11 +174,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               email: responseUser.email,
             };
 
-            if (pathname.startsWith("/admin")){
+            if (pathname.startsWith("/admin")) {
               const newAdmin: Admin = {
                 name: responseUser.name,
                 email: responseUser.email,
-                pnumber: responseUser.phoneNumber || ""
+                pnumber: responseUser.phoneNumber || "",
               };
               setUser(newUser);
               setAdmin(newAdmin);
@@ -223,10 +224,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem("member");
           localStorage.removeItem("admin");
 
-          {pathname.startsWith("/admin") ?
-            router.replace("/admin/auth")
-            :
-            router.replace("/auth/login")
+          {
+            pathname.startsWith("/admin")
+              ? router.replace("/admin/auth")
+              : router.replace("/auth/login");
           }
           setIsLoading(false);
           return;
@@ -410,7 +411,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const newAdmin: Admin = {
         name: responseUser.name,
         email: responseUser.email,
-        pnumber: responseUser.phoneNumber || ""
+        pnumber: responseUser.phoneNumber || "",
       };
       setAdmin(newAdmin);
       localStorage.setItem("user", JSON.stringify(newUser));
@@ -436,21 +437,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setUser(null);
     setMember(null);
+    clearCart();
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.removeItem("member");
     localStorage.removeItem("admin");
     localStorage.removeItem("cart");
 
-    {pathname.startsWith("/admin") ?
-      router.replace("/admin/auth")
-      :
-      router.replace("/auth/login")
+    {
+      pathname.startsWith("/admin")
+        ? router.replace("/admin/auth")
+        : router.replace("/auth/login");
     }
     toast.success("You have been logged out successfully.", {
       richColors: true,
       position: "top-center",
     });
+    window.location.reload();
   };
 
   // Update profile function

@@ -82,6 +82,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => {
     setCart([]);
+    setMounted(false);
   };
 
   return (
