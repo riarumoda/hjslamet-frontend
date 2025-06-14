@@ -1,7 +1,7 @@
 "use client";
-import { toast } from '@/components/ToastContainer';
+
+import { toast } from 'sonner'; 
 import ProductForm from '@/components/ui-admin/product-form';
-import { useAuth } from '@/hooks/use-auth';
 import { fetchData } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
@@ -12,28 +12,25 @@ export default function AddProdcutPage() {
     const handleCreateProduct = async (formData: any) => {
         try {
             if (formData.category == "") {
-                toast({
-                    message: "Please select category",
-                    type: "error",
-                    duration: 4000,
-                });
+                toast.error("Please select category", {
+                    position:"top-right"
+                })
                 return;
             }
 
-            await fetchData("products", true, "POST", formData)
-            toast({
-                message: "Success add product",
-                type: "success",
-                duration: 4000,
-            })            
-
+            const result = await fetchData("products", true, "POST", formData)
+            toast.promise(result, {
+                position:"top-right",
+                loading: 'Loading...',
+                success: "Product added successfully.",
+                error: 'Error',
+            });          
             router.push("/admin/products")
         } catch (error: any) {
-            toast({
-                message: "Failed add product",
-                type: "error",
-                duration: 4000,
-            })
+            toast.error("Failed add product.", {
+            richColors: true,
+            position: "top-right",
+            });
             console.log(error);
         }
     };

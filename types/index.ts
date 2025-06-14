@@ -23,6 +23,24 @@ export interface Category {
   image?: string
 }
 
+export interface TrxDetail {
+  detailId: string
+  product: Product
+  qty: number
+  subtotal: number
+  notes:string
+}
+
+export interface Trx {
+  invoiceId: string
+  member: Member
+  details: TrxDetail[]
+  totalAmount: number
+  trxDate: string
+  status: "PROSES" | "DIKIRIM" | "SELESAI" | "DIBATALKAN"
+  updatedAt: string  
+}
+
 export interface Order {
   invoiceId: string
   memberId: string
