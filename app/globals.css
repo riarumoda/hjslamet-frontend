@@ -213,3 +213,31 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #printable-modal,
+  #printable-modal * {
+    visibility: visible !important;
+  }
+
+  #printable-modal {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    padding: 2rem !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    z-index: 9999;
+    overflow: visible !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}
