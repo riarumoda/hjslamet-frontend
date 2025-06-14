@@ -32,7 +32,12 @@ export default function AuthAdminPage() {
           richColors: true,
           position: "top-right",
         });
-        const returnUrl = searchParams.get("returnUrl") || "/admin/members";
+        let returnUrl = searchParams.get("returnUrl") ?? "/admin/members";
+
+        if (returnUrl === "/admin") {
+          returnUrl = "/admin/members";
+        }
+
         router.push(returnUrl);
       } else {
         toast.error(result.message, {
